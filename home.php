@@ -151,7 +151,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 
         // Selezione dello username dell'utente loggato
         $id = $_SESSION["user_id"];
-        $stmt = $pdo->prepare("SELECT username FROM utente WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT `username` FROM `utente` WHERE `id` = :id");
         $stmt -> bindValue(":id", $id, PDO::PARAM_INT);
         $stmt -> execute();
         $user = $stmt->fetch();

@@ -35,13 +35,13 @@ use PHPMailer\PHPMailer\Exception;                     // Utilizzare il costrutt
 
     // Mittente
     // Nome del mittente
-    $stmt = $pdo->prepare("SELECT nome FROM docente LEFT JOIN utente ON docente.id = utente.id WHERE docente.id = :id");
-    $stmt->bindValue(":id", $_SESSION["user_id"]);
+    $stmt = $pdo->prepare("SELECT nome FROM docente LEFT JOIN utente ON docente.rifUtente = utente.id WHERE docente.rifUtente = :rif");
+    $stmt->bindValue(":rif", $_SESSION["user_id"]);
     $stmt->execute();
     $nomeMittente = $stmt->fetch();
     // Email del mittente
-    $stmt = $pdo->prepare("SELECT email FROM docente LEFT JOIN utente ON docente.id = utente.id WHERE docente.id = :id");
-    $stmt->bindValue(":id", $_SESSION["user_id"]);
+    $stmt = $pdo->prepare("SELECT email FROM docente LEFT JOIN utente ON docente.rifUtente = utente.id WHERE docente.rifUtente = :rif");
+    $stmt->bindValue(":rif", $_SESSION["user_id"]);
     $stmt->execute();
     $emailMittente = $stmt->fetch();
 
