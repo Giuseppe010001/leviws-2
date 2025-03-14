@@ -8,7 +8,7 @@ global $pdo;
 $action = $_GET["action"] ?? "";
 
 // Lettura dal JSON
-if ($action === "read") {
+if ($action == "read") {
 
     // Parametri inviati da DataTables
     $start = isset($_POST["start"]) ? (int)$_POST["start"] : 0;
@@ -81,7 +81,7 @@ if ($action === "read") {
     ]);
 
 // Modifica utente
-} elseif ($action === "edit") {
+} elseif ($action == "edit") {
     $id = $_GET["id"];
     $stmt = $pdo->prepare("SELECT * FROM `utente` WHERE `id` = :id");
     $stmt -> bindValue(":id", $id, PDO::PARAM_INT);
@@ -89,7 +89,7 @@ if ($action === "read") {
     echo json_encode($stmt -> fetch());
 
 // Salvataggio utente
-} elseif ($action === "save") {
+} elseif ($action == "save") {
     $id = $_POST["userId"] ?? null;
     $username = $_POST["username"];
     $password = $_POST["password"] ?? null;
@@ -123,7 +123,7 @@ if ($action === "read") {
     }
 
 // Eliminazione utente
-} elseif ($action === "delete") {
+} elseif ($action == "delete") {
     $id = $_POST["id"];
     $stmt = $pdo->prepare("DELETE FROM `utente` WHERE `id` = :id");
     $stmt -> bindValue(":id", $id);

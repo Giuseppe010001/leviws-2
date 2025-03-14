@@ -178,7 +178,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <?php if ($_SESSION["group_id"] === 1): ?>
+                <?php if ($_SESSION["group_id"] == 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <?php endif; ?>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
