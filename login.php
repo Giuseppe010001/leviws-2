@@ -19,7 +19,7 @@ require "includes/functions.php"; // Richiedere il file includes/functions.php
 $error = "";
 
 // Controllo della correttezza del login da parte dell'utente
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (loginUser($pdo, $_POST["username"], $_POST["password"])) {
         header("Location: home.php");
         exit;
