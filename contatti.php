@@ -216,7 +216,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class = "mb-3">
                 <label for = "destinatario" class = "form-label text-dark">Destinatario</label>
                 <select id = "destinatario" name = "destinatario" class = "form-select">
-                    <option value = "Mario Arcangelo Sorvillo">Mario Arcangelo Sorvillo</option>
+                    <option value = "Mario Sorvillo">Mario Sorvillo</option>
                     <option value = "Emanuele Gnoni">Emanuele Gnoni</option>
                     <option value = "Giuseppe Carlino">Giuseppe Carlino</option>
                 </select>

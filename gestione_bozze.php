@@ -8,15 +8,13 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit;
 }
-
-require "includes/db.php"; // Richiedere il file includes/db.php
 ?>
 <!DOCTYPE html>
 <html lang = "it">
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Gestione Bozze</title>
+    <title>Gestione Utenti</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "assets/css/datatables.min.css">
     <style>
@@ -81,7 +79,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             width: 85%;
             height: 33.48%
         }
-        .boxGestioneUtenti {
+        .boxGestioneBozze {
             position: absolute;
             bottom: 10%;
             width: 85%;
@@ -101,20 +99,21 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_utente.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_bozza.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
 
                     {"data": "id"},
-                    {"data": "username"},
-                    {"data": "group_name"},
+                    {"data": "nome"},
+                    {"data": "tipo"},
+                    {"data": "descrizione"},
                     {
                         "data": "id",
                         render: function (data) {
                             return `
                             <button class = "btn btn-sm btn-warning editUser" data-id="${data}">Modifica</button>
-                            <button class = "btn btn-sm btn-danger deleteUser" data-id="${data}">Elimina</button>
+                            <button class = "btn btn-sm btn-danger deleteUser" style = "width: 71px" data-id="${data}">Elimina</button>
                         `;
                         }
                     }
@@ -137,7 +136,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             // Modifica utente
             table.on("click", ".editUser", function() {
                 const userId = $(this).data("id");
-                $.get("azioni_utente.php?action=edit&id=" + userId, function(data) {
+                $.get("azioni_bozza.php?action=edit&id=" + userId, function(data) {
                     const user = JSON.parse(data);
                     $("#userId").val(user.id);
                     $("#username").val(user.username);
@@ -150,8 +149,8 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             table.on("click", ".deleteUser", function() {
                 const userId = $(this).data("id");
                 const username = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare l\'utente: " + username + '?')) {
-                    $.post("azioni_utente.php?action=delete", { id: userId }, function() {
+                if (confirm("Sei sicuro di voler eliminare la bozza: " + username + '?')) {
+                    $.post("azioni_bozza.php?action=delete", { id: userId }, function() {
                         table.ajax.reload();
                     });
                 }
@@ -161,7 +160,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             $("#userForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
-                $.post("azioni_utente.php?action=save", formData, function() {
+                $.post("azioni_bozza.php?action=save", formData, function() {
                     $("#userModal").modal("hide");
                     table.ajax.reload();
                 });
@@ -178,9 +177,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <?php if ($_SESSION["group_id"] == 1): ?>
-                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
-                <?php endif; ?>
+                <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
                 <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
                 <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
@@ -199,7 +196,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             </tr>
         </table>
     </div>
-    <div class = "boxGestioneUtenti">
+    <div class = "boxGestioneBozze">
         <h2 class = "text-center text-light">Gestione Bozze</h2>
         <div class = "container mt-5 p-2 bg-light border rounded">
             <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Bozza</button>
@@ -207,16 +204,18 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Username</th>
-                    <th>Gruppo</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
                     <th>ID</th>
-                    <th>Username</th>
-                    <th>Gruppo</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -229,25 +228,25 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 <div class = "modal-content">
                     <form id = "userForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Bozza</h5>
+                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Utente</h5>
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
                             <input type = "hidden" id = "userId" name = "userId">
                             <div class = "mb-3">
-                                <label for = "username" class = "form-label">Username</label>
-                                <input type = "text" class = "form-control" id = "username" name = "username" required>
+                                <label for = "nome" class = "form-label">Nome</label>
+                                <input type = "text" class = "form-control" id = "nome" name = "nome" required>
                             </div>
                             <div class = "mb-3">
-                                <label for = "password" class = "form-label">Password</label>
-                                <input type = "password" class = "form-control" id = "password" name = "password">
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "group" class = "form-label">Gruppo</label>
-                                <select id = "group" name = "group" class = "form-select">
-                                    <option value = "1">Admin</option>
-                                    <option value = "2">Utente</option>
+                                <label for = "tipo" class = "form-label">Tipo</label>
+                                <select id = "tipo" name = "tipo" class = "form-select">
+                                    <option value = "viaggio">viaggio</option>
+                                    <option value = "uscita">uscita</option>
                                 </select>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "descrizione" class = "form-label">Descrizione</label>
+                                <textarea type = "text" class = "form-control" style = "width: 466px; min-height: 200px; max-height: 200px" id = "descrizione" name = "descrizione"></textarea>
                             </div>
                         </div>
                         <div class = "modal-footer">

@@ -112,7 +112,7 @@ if (!isset($_SESSION["user_id"])) {
                         render: function (data) {
                             return `
                             <button class = "btn btn-sm btn-warning editUser" data-id="${data}">Modifica</button>
-                            <button class = "btn btn-sm btn-danger deleteUser" data-id="${data}">Elimina</button>
+                            <button class = "btn btn-sm btn-danger deleteUser" style = "width: 71px" data-id="${data}">Elimina</button>
                         `;
                         }
                     }

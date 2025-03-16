@@ -80,7 +80,7 @@ $canAccessSettings = checkPermission($pdo, $userGroupId, "access_settings");*/
         </div>
         <div class = "boxReport">
             <h1 class = "text-center text-light">Scarica Relazione</h1>
-            <form action="scarica_relazione_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px;">
+            <form action = "scarica_relazione_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px;">
                 <div class = "mb-3">
                     <label for = "nomeReferente" class = "form-label text-dark">Nome referente</label>
                     <input type = "text" id = "nomeReferente" name = "nomeReferente" class = "form-control" required>

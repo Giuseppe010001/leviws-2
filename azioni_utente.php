@@ -4,7 +4,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 // Dichiarazione della variabile globale $pdo, necessaria per il file db.php
 global $pdo;
 
-// Prelievo del valore di action da gestione_utenti.php mediante il metodo GET. Nel caso action fosse vuoto, assegnazione di una stringa vuota
+// Prelievo del valore di action da gestione_utenti.php mediante il metodo GET. Nel caso action fosse vuoto, assegnare una stringa vuota
 $action = $_GET["action"] ?? "";
 
 // Lettura dal JSON
