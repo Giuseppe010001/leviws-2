@@ -3,7 +3,7 @@
 // Inizio della sessione
 session_start();
 
-// Dichiarazione della variabile globale $pdo, necessaria per i file db.php e functions.php
+// Dichiarazione della variabile globale $pdo, necessaria per il file db.php
 global $pdo;
 
 // Verificare che l'utente (admin o user) si sia prima loggato

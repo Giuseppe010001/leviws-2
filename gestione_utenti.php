@@ -8,8 +8,6 @@ if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit;
 }
-
-require "includes/db.php"; // Richiedere il file includes/db.php
 ?>
 <!DOCTYPE html>
 <html lang = "it">

@@ -3,7 +3,7 @@
 // Inizio della sessione
 session_start();
 
-// Dichiarazione della variabile globale $pdo, necessaria per i file db.php e functions.php
+// Dichiarazione della variabile globale $pdo, necessaria per il file db.php
 global $pdo;
 
 // Verificare che l'utente (admin o user) si sia prima loggato
@@ -12,119 +12,83 @@ if (!isset($_SESSION["user_id"])) {
     exit;
 }
 
-require "includes/db.php";                             // Richiedere il file includes/db.php
-require 'includes/PHPMailer-master/src/Exception.php'; // Richiedere il file includes/PHPMailer-master/src/Exception.php
-require 'includes/PHPMailer-master/src/PHPMailer.php'; // Richiedere il file includes/PHPMailer-master/src/PHPMailer.php
-require 'includes/PHPMailer-master/src/SMTP.php';      // Richiedere il file includes/PHPMailer-master/src/SMTP.php
+require "includes/db.php"; // Richiedere il file includes/db.php
+require 'includes/PHPMailer/PHPMailerAutoload.php'; // Richiedere il file includes/PHPMailer/PHPMailerAutoload.php
 
 // Dichiarazione ed implementazione variabili di conferma ed errore nell'invio della e-mail
 $sent = "";
 $error = "";
 
-use PHPMailer\PHPMailer\PHPMailer;                     // Utilizzare il costruttore PHPMailer
-use PHPMailer\PHPMailer\SMTP;                          // Utilizzare il costruttore SMTP
-use PHPMailer\PHPMailer\Exception;                     // Utilizzare il costruttore Exception
-
-/*if ($_SERVER["REQUEST_METHOD"] === "POST") {
+// Dati ricevuti mediante metodo POST
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Dati dal form
-    $password = $_POST["password"];
+    // Destinatario
     $destinatario = $_POST["destinatario"];
+    $destinatario = strtok($destinatario, " ");
+    $nomeDestinatario = $destinatario;
+    $destinatario = strtok(" ");
+    $cognomeDestinatario = $destinatario;
+    // Oggetto
     $oggetto = $_POST["oggetto"];
+    // Corpo
     $corpo = $_POST["corpo"];
 
     // Mittente
     // Nome del mittente
-    $stmt = $pdo->prepare("SELECT nome FROM docente LEFT JOIN utente ON docente.rifUtente = utente.id WHERE docente.rifUtente = :rif");
-    $stmt->bindValue(":rif", $_SESSION["user_id"]);
-    $stmt->execute();
-    $nomeMittente = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE docente.id = :id");
+    $stmt -> bindValue(":id", $_SESSION["user_id"]);
+    $stmt -> execute();
+    $nomeMittente = $stmt->fetchColumn();
     // Email del mittente
-    $stmt = $pdo->prepare("SELECT email FROM docente LEFT JOIN utente ON docente.rifUtente = utente.id WHERE docente.rifUtente = :rif");
-    $stmt->bindValue(":rif", $_SESSION["user_id"]);
-    $stmt->execute();
-    $emailMittente = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE docente.id = :id");
+    $stmt -> bindValue(":id", $_SESSION["user_id"]);
+    $stmt -> execute();
+    $emailMittente = $stmt->fetchColumn();
 
     // Destinatario
     // Nome del destinatario
-    $stmt = $pdo->prepare("SELECT nome FROM docente WHERE nome = :nome");
-    $stmt->bindValue(":id", $destinatario);
-    $stmt->execute();
-    $nomeDestinatario = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `nome` = :nome AND `cognome` = :cognome");
+    $stmt -> bindValue(":nome", $nomeDestinatario);
+    $stmt -> bindValue(":cognome", $cognomeDestinatario);
+    $stmt -> execute();
+    $nomeDestinatario = $stmt->fetchColumn();
     // Email del destinatario
-    $stmt = $pdo->prepare("SELECT email FROM docente WHERE nome = :nome");
-    $stmt->bindValue(":nome", $destinatario);
-    $stmt->execute();
-    $emailDestinatario = $stmt->fetch();
+    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `nome` = :nome AND `cognome` = :cognome");
+    $stmt -> bindValue(":nome", $nomeDestinatario);
+    $stmt -> bindValue(":cognome", $cognomeDestinatario);
+    $stmt -> execute();
+    $emailDestinatario = $stmt->fetchColumn();
 
-    // Se true, vengono sollevate eventuali eccezioni utili per il debugging
-    $mail = new PHPMailer(true);
+    // Istanziare un oggetto PHPMailer
+    $mail = new PHPMailer;
 
+    // Configurazione server SMTP
+    $mail -> isSMTP(); // Utilizzare server SMTP
+    $mail -> Host = "smtp.gmail.com"; // Nome del server SMTP da utilizzare
+    $mail -> SMTPAuth = true; // Abilitazione autenticazione server SMTP
+    $mail -> Username = $emailMittente; // Indirizzo e-mail del mittente
+    $mail -> Password = "Giuppy+1010110101010!!!"; // Password del mittente
+    $mail -> SMTPSecure = "tls"; // Abilitazione crittografia protocollo TLS
+    $mail -> Port = 587; // Connessione alla porta 587
+
+    // Verifica di eventuali errori nella procedura di invio della e-mail
     try {
+        $mail -> setFrom($emailMittente, $nomeMittente); // Mittente
+        $mail -> addAddress($emailMittente, $nomeMittente); // Destinatario
 
-        // Impostazioni server
-        $mail -> SMTPDebug = SMTP::DEBUG_SERVER;                    // Debug mode
-        $mail -> isSMTP();                                          // Invio tramite SMTP
-        $mail -> Host = "smtp.gmail.com";                           // Server SMTP
-        $mail -> SMTPAuth = true;                                   // Abilita autenticazione SMTP
-        $mail -> Username = $emailMittente;                         // SMTP username
-        $mail -> Password = $password;                              // SMTP password
-        $mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;       // Abilita TLS implicito
-        $mail -> Port = 587;                                        // Porta SMTP
+        $mail -> Subject = $oggetto; // Oggetto
+        $mail -> Body = $corpo; // Corpo
 
-        // Recipients
-        $mail -> setFrom($emailMittente, $nomeMittente);            // Indirizzo mittente
-        $mail -> addAddress($emailDestinatario, $nomeDestinatario); // Indirizzo destinatario
-        $mail -> addReplyTo($emailMittente, $nomeMittente);         // Indirizzo di risposta
-
-        // Content
-        $mail -> isHTML();                                          // Abilita invio in HTML
-        $mail -> Subject = $oggetto;                                // Oggetto
-        $mail -> Body = $corpo;                                     // Corpo
-
-        // Invio
-        $mail -> send();
-        $sent = "Il messaggio è stato inviato con successo.";
-    } catch (Exception $e) {
-
-        // Errore
-        $error = "Il messaggio non è stato inviato.";
-    }*/
-
-// Se true, vengono sollevate eventuali eccezioni utili per il debugging
-$mail = new PHPMailer(true);
-
-try {
-
-    // Impostazioni server
-    $mail -> SMTPDebug = SMTP::DEBUG_SERVER;                // Debug mode
-    $mail -> isSMTP();                                      // Invio tramite SMTP
-    $mail -> Host = "smtp.gmail.com";                      // Server SMTP
-    $mail -> SMTPAuth = true;                               // Abilita autenticazione SMTP
-    $mail -> Username = "giuseppecarlino06@gmail.com";      // SMTP username
-    $mail -> Password = "Giuseppe1706!";                    // SMTP password
-    $mail -> From = "giuseppecarlino06@gmail.com";          // Email mittente
-    $mail -> FromName = "Giuseppe";                         // Nome mittente
-    $mail -> SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;   // Abilita TLS implicito
-    $mail -> Port = 587;                                    // Porta SMTP
-
-    // Recipients
-    $mail -> setFrom("giuseppecarlino06@gmail.com", "Giuseppe");     // Indirizzo mittente
-    $mail -> addAddress("giuseppecarlino06@gmail.com", "Giuseppe");  // Indirizzo destinatario
-    $mail -> addReplyTo("giuseppecarlino06@gmail.com", "Giuseppe");  // Indirizzo di risposta
-
-    // Content
-    $mail -> isHTML();                                       // Abilita invio in HTML
-    $mail -> Subject = "Oggetto";                            // Oggetto
-    $mail -> Body = "Corpo";                                 // Corpo
-
-    // Invio
-    $mail -> send();
-    $sent = "Il messaggio è stato inviato con successo.";
-} catch (Exception $e) {
-
-    // Errore
-    $error = "Il messaggio non è stato inviato.";
+        // Verifica dell'invio della e-mail
+        if ($mail -> send()) {
+            $sent = "Messaggio inviato!";
+        } else {
+            $error = "Messaggio non inviato!";
+        }
+    } catch (phpmailerException $e) {
+        $error = "Si è verificato un errore: ".$e->getMessage().'.';
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -219,7 +183,7 @@ try {
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <?php if ($_SESSION["group_id"] === 1): ?>
+                <?php if ($_SESSION["group_id"] == 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <?php endif; ?>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
@@ -250,14 +214,11 @@ try {
                 <div class = "alert alert-danger"><?php echo $error ?></div>
             <?php endif; ?>
             <div class = "mb-3">
-                <label for = "password" class = "form-label text-dark">Password Gmail</label>
-                <input type = "password" id = "password" name = "password" class = "form-control" required>
-            </div>
-            <div class = "mb-3">
                 <label for = "destinatario" class = "form-label text-dark">Destinatario</label>
                 <select id = "destinatario" name = "destinatario" class = "form-select">
-                    <option value = "1">Mario Arcangelo Sorvillo</option>
-                    <option value = "2">Emanuele Gnoni</option>
+                    <option value = "Mario Arcangelo Sorvillo">Mario Arcangelo Sorvillo</option>
+                    <option value = "Emanuele Gnoni">Emanuele Gnoni</option>
+                    <option value = "Giuseppe Carlino">Giuseppe Carlino</option>
                 </select>
             </div>
             <div class = "mb-3">

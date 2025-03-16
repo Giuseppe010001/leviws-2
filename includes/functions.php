@@ -4,7 +4,7 @@
 function loginUser($pdo, $username, $password): bool {
     $stmt = $pdo->prepare("SELECT * FROM utente WHERE username = :username");
     $stmt -> bindValue(":username", $username);
-    $stmt->execute();
+    $stmt -> execute();
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
