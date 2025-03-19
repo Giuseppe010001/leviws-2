@@ -37,7 +37,7 @@ if ($action == "read") {
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE u.username LIKE :search OR g.nome LIKE :search OR d.nome LIKE :search OR d.cognome LIKE :search";
+        $query .= " WHERE u.username LIKE :search OR g.nome LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -59,12 +59,12 @@ if ($action == "read") {
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // Conteggio totale dei record
-    $totalRecordsQuery = "SELECT COUNT(*) FROM `utente` LEFT JOIN `docente` on utente.id = docente.rifUtente";
+    $totalRecordsQuery = "SELECT COUNT(*) FROM `utente`";
     $totalRecords = $pdo->query($totalRecordsQuery)->fetchColumn();
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `utente` INNER JOIN `docente` ON utente.id = docente.rifUtente WHERE docente.nome LIKE :search OR `cognome` LIKE :search OR `username` LIKE :search OR group.nome LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `utente` WHERE `username` LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> bindValue(":search", $searchValue);
         $stmtFiltered -> execute();
@@ -83,16 +83,16 @@ if ($action == "read") {
 // Modifica utente
 } elseif ($action == "edit") {
     $id = $_GET["id"];
-    $stmt = $pdo->prepare("SELECT * FROM `utente` LEFT JOIN `docente` ON utente.id = docente.rifUtente WHERE utente.id = :id");
-    $stmt -> bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt = $pdo->prepare("SELECT * FROM `utente` LEFT JOIN `docente` ON utente.id = docente.rifUtente WHERE utente.id = :rif");
+    $stmt -> bindValue(":rif", $id, PDO::PARAM_INT);
     $stmt -> execute();
     echo json_encode($stmt -> fetch());
 
 // Salvataggio utente
 } elseif ($action == "save") {
     $id = $_POST["userId"] ?? null;
-    $nomeDocente = $_POST["nomeDocente"];
-    $cognomeDocente = $_POST["cognomeDocente"];
+    $nome = $_POST["nome"];
+    $cognome = $_POST["cognome"];
     $username = $_POST["username"];
     $password = $_POST["password"] ?? null;
     $group = $_POST["group"];
@@ -106,8 +106,8 @@ if ($action == "read") {
         $stmt -> bindValue(":id", $id, PDO::PARAM_INT);
         $stmt -> execute();
         $stmt = $pdo->prepare("UPDATE `docente` SET `nome` = :nome, `cognome` = :cognome, `rifUtente` = :rif WHERE `id` = :rif");
-        $stmt -> bindValue(":nome", $nomeDocente);
-        $stmt -> bindValue(":cognome", $cognomeDocente);
+        $stmt -> bindValue(":nome", $nome);
+        $stmt -> bindValue(":cognome", $cognome);
         $stmt -> bindValue(":rif", $id, PDO::PARAM_INT);
         $stmt -> execute();
 
@@ -128,9 +128,9 @@ if ($action == "read") {
         $stmt -> bindValue(":group", $group, PDO::PARAM_INT);
         $stmt -> execute();
         $stmt = $pdo->prepare("INSERT INTO `docente` (`nome`, `cognome`, `email`, `rifUtente`) VALUES (:nome, :cognome, :email, :rifUtente)");
-        $stmt -> bindValue(":nome", $nomeDocente);
-        $stmt -> bindValue(":cognome", $cognomeDocente);
-        $stmt -> bindValue(":email", $cognomeDocente.'.'.$nomeDocente."@istitutolevi.edu.it");
+        $stmt -> bindValue(":nome", $nome);
+        $stmt -> bindValue(":cognome", $cognome);
+        $stmt -> bindValue(":email", $cognome.'.'.$nome."@istitutolevi.edu.it");
         $stmt -> bindValue(":rifUtente", $id, PDO::PARAM_INT);
         $stmt -> execute();
     }
