@@ -228,7 +228,7 @@ if (!isset($_SESSION["user_id"])) {
                 <div class = "modal-content">
                     <form id = "userForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Utente</h5>
+                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Bozza</h5>
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">

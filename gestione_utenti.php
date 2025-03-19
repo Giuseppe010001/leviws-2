@@ -105,6 +105,8 @@ if (!isset($_SESSION["user_id"])) {
                 "columns": [
 
                     {"data": "id"},
+                    {"data": "nome"},
+                    {"data": "cognome"},
                     {"data": "username"},
                     {"data": "group_name"},
                     {
@@ -138,6 +140,8 @@ if (!isset($_SESSION["user_id"])) {
                 $.get("azioni_utente.php?action=edit&id=" + userId, function(data) {
                     const user = JSON.parse(data);
                     $("#userId").val(user.id);
+                    $("#nome").val(user.nome);
+                    $("#cognome").val(user.cognome);
                     $("#username").val(user.username);
                     $("#group").val(user.group_id);
                     $("#userModal").modal("show");
@@ -203,6 +207,8 @@ if (!isset($_SESSION["user_id"])) {
                 <thead>
                 <tr>
                     <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
                     <th>Username</th>
                     <th>Gruppo</th>
                     <th data-dt-order = "disable">Azioni</th>
@@ -211,6 +217,8 @@ if (!isset($_SESSION["user_id"])) {
                 <tfoot>
                 <tr>
                     <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cognome</th>
                     <th>Username</th>
                     <th>Gruppo</th>
                     <th>Azioni</th>
@@ -230,6 +238,14 @@ if (!isset($_SESSION["user_id"])) {
                         </div>
                         <div class = "modal-body">
                             <input type = "hidden" id = "userId" name = "userId">
+                            <div class = "mb-3">
+                                <label for = "nome" class = "form-label">Nome</label>
+                                <input type = "text" class = "form-control" id = "nome" name = "nome" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "cognome" class = "form-label">Cognome</label>
+                                <input type = "text" class = "form-control" id = "cognome" name = "cognome" required>
+                            </div>
                             <div class = "mb-3">
                                 <label for = "username" class = "form-label">Username</label>
                                 <input type = "text" class = "form-control" id = "username" name = "username" required>
