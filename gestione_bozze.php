@@ -106,8 +106,9 @@ if (!isset($_SESSION["user_id"])) {
 
                     {"data": "id"},
                     {"data": "nome"},
-                    {"data": "tipo"},
                     {"data": "descrizione"},
+                    {"data": "autore"},
+                    {"data": "data creazione"},
                     {
                         "data": "id",
                         render: function (data) {
@@ -175,7 +176,7 @@ if (!isset($_SESSION["user_id"])) {
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
                 <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
@@ -205,8 +206,9 @@ if (!isset($_SESSION["user_id"])) {
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>Tipo</th>
                     <th>Descrizione</th>
+                    <th>Autore</th>
+                    <th>Data creazione</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
@@ -214,8 +216,9 @@ if (!isset($_SESSION["user_id"])) {
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
-                    <th>Tipo</th>
                     <th>Descrizione</th>
+                    <th>Autore</th>
+                    <th>Data creazione</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -238,15 +241,8 @@ if (!isset($_SESSION["user_id"])) {
                                 <input type = "text" class = "form-control" id = "nome" name = "nome" required>
                             </div>
                             <div class = "mb-3">
-                                <label for = "tipo" class = "form-label">Tipo</label>
-                                <select id = "tipo" name = "tipo" class = "form-select">
-                                    <option value = "viaggio">viaggio</option>
-                                    <option value = "uscita">uscita</option>
-                                </select>
-                            </div>
-                            <div class = "mb-3">
                                 <label for = "descrizione" class = "form-label">Descrizione</label>
-                                <textarea type = "text" class = "form-control" style = "width: 466px; min-height: 200px; max-height: 200px" id = "descrizione" name = "descrizione"></textarea>
+                                <textarea type = "text" class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
                             </div>
                         </div>
                         <div class = "modal-footer">

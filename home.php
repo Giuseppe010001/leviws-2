@@ -123,7 +123,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION["group_id"] == 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
@@ -152,16 +152,14 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         // Selezione dello username dell'utente loggato
         $id = $_SESSION["user_id"];
         $stmt = $pdo->prepare("SELECT `username` FROM `utente` WHERE `id` = :id");
-        $stmt -> bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt -> execute();
-        $user = $stmt->fetch();
-        $username = $user["username"];
+        $stmt -> execute([":id" => $id]);
+        $user = $stmt->fetchColumn();
 
         // Saluto all'utente loggato secondo una modalità consona all'orario di accesso
         if (date('H') > 0 and date('H') < 12)
-            echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buongiorno $username!!!</h1>";
+            echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buongiorno $user!!!</h1>";
         else
-            echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buonasera $username!!!</h1>";
+            echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buonasera $user!!!</h1>";
         ?>
     </div>
 </div>

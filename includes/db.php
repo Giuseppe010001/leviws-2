@@ -21,5 +21,5 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Tentativo fallimentare di connessione alla banca dati: " . $e -> getMessage());
+    die("Tentativo fallimentare di connessione alla banca dati: " . $e->getMessage());
 }

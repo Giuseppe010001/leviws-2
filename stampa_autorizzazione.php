@@ -103,7 +103,7 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Compila modulo</a></li>
                 <?php if ($_SESSION['group_id'] === 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>

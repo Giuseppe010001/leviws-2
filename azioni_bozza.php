@@ -18,7 +18,7 @@ if ($action == "read") {
     $orderDirection = isset($_POST["order"][0]["dir"]) && in_array($_POST["order"][0]["dir"], ["asc", "desc"]) ? $_POST["order"][0]["dir"] : "asc";
 
     // Array di mappatura colonne (per ordinamento)
-    $columns = ["id", "nome", "tipo", "descrizione"];
+    $columns = ["id", "nome", "descrizione", "autore", "ruolo", "data"];
 
     // Configurazione iniziale della tabella di gestione bozze
     if (!empty($searchValue)) {
@@ -33,7 +33,7 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT `id`, `nome`, `tipo`, `descrizione` FROM `bozza`";
+    $query = "SELECT b.id, b.nome, b.descrizione, d.nome, d.cognome, e.ruolo, e.data";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))

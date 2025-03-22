@@ -95,7 +95,7 @@ if (!isset($_SESSION["user_id"])) {
         $(document).ready(function() {
 
             // Inizializza DataTables
-            const table = $('#usersTable').DataTable({
+            const table = $("#usersTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -105,8 +105,7 @@ if (!isset($_SESSION["user_id"])) {
                 "columns": [
 
                     {"data": "id"},
-                    {"data": "nome"},
-                    {"data": "cognome"},
+                    {"data": "docente"},
                     {"data": "username"},
                     {"data": "group_name"},
                     {
@@ -129,8 +128,10 @@ if (!isset($_SESSION["user_id"])) {
 
             // Aggiungi utente
             $("#addUser").on("click", function() {
+                $("#docenteBlocco").show();
                 $("#userForm")[0].reset();
                 $("#userId").val("");
+                $("#password").prop("required", true);
                 $("#userModal").modal("show");
             });
 
@@ -139,11 +140,10 @@ if (!isset($_SESSION["user_id"])) {
                 const userId = $(this).data("id");
                 $.get("azioni_utente.php?action=edit&id=" + userId, function(data) {
                     const user = JSON.parse(data);
+                    $("#docenteBlocco").hide();
                     $("#userId").val(user.id);
-                    $("#nome").val(user.nome);
-                    $("#cognome").val(user.cognome);
                     $("#username").val(user.username);
-                    $("#group").val(user.group_id);
+                    $("#password").prop("required", false);
                     $("#userModal").modal("show");
                 });
             });
@@ -151,7 +151,7 @@ if (!isset($_SESSION["user_id"])) {
             // Elimina utente
             table.on("click", ".deleteUser", function() {
                 const userId = $(this).data("id");
-                const username = $(this).parents("tr").find("td:eq(1)").text();
+                const username = $(this).parents("tr").find("td:eq(3)").text();
                 if (confirm("Sei sicuro di voler eliminare l\'utente: " + username + '?')) {
                     $.post("azioni_utente.php?action=delete", { id: userId }, function() {
                         table.ajax.reload();
@@ -178,7 +178,7 @@ if (!isset($_SESSION["user_id"])) {
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
                 <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
@@ -207,8 +207,7 @@ if (!isset($_SESSION["user_id"])) {
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nome</th>
-                    <th>Cognome</th>
+                    <th>Docente</th>
                     <th>Username</th>
                     <th>Gruppo</th>
                     <th data-dt-order = "disable">Azioni</th>
@@ -217,8 +216,7 @@ if (!isset($_SESSION["user_id"])) {
                 <tfoot>
                 <tr>
                     <th>ID</th>
-                    <th>Nome</th>
-                    <th>Cognome</th>
+                    <th>Docente</th>
                     <th>Username</th>
                     <th>Gruppo</th>
                     <th>Azioni</th>
@@ -238,13 +236,9 @@ if (!isset($_SESSION["user_id"])) {
                         </div>
                         <div class = "modal-body">
                             <input type = "hidden" id = "userId" name = "userId">
-                            <div class = "mb-3">
-                                <label for = "nome" class = "form-label">Nome</label>
-                                <input type = "text" class = "form-control" id = "nome" name = "nome" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "cognome" class = "form-label">Cognome</label>
-                                <input type = "text" class = "form-control" id = "cognome" name = "cognome" required>
+                            <div id = "docenteBlocco" class = "mb-3">
+                                <label for = "docente" class = "form-label">Docente</label>
+                                <input type = "text" class = "form-control" id = "docente" name = "docente" placeholder = "Nome Cognome" required>
                             </div>
                             <div class = "mb-3">
                                 <label for = "username" class = "form-label">Username</label>
@@ -257,8 +251,8 @@ if (!isset($_SESSION["user_id"])) {
                             <div class = "mb-3">
                                 <label for = "group" class = "form-label">Gruppo</label>
                                 <select id = "group" name = "group" class = "form-select">
-                                    <option value = "1">Admin</option>
-                                    <option value = "2">Utente</option>
+                                    <option value = '1'>Admin</option>
+                                    <option value = '2'>Utente</option>
                                 </select>
                             </div>
                         </div>

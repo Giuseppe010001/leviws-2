@@ -25,10 +25,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Dati dal form
     // Destinatario
     $destinatario = $_POST["destinatario"];
-    $destinatario = strtok($destinatario, " ");
-    $nomeDestinatario = $destinatario;
-    $destinatario = strtok(" ");
-    $cognomeDestinatario = $destinatario;
     // Oggetto
     $oggetto = $_POST["oggetto"];
     // Corpo
@@ -36,49 +32,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Mittente
     // Nome del mittente
-    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE docente.id = :id");
-    $stmt -> bindValue(":id", $_SESSION["user_id"]);
-    $stmt -> execute();
+    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
+    $stmt -> execute([":id" => $_SESSION["user_id"]]);
     $nomeMittente = $stmt->fetchColumn();
+    $nomeMittente = strtok($nomeMittente, " ");
     // Email del mittente
-    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE docente.id = :id");
-    $stmt -> bindValue(":id", $_SESSION["user_id"]);
-    $stmt -> execute();
+    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
+    $stmt -> execute(["id" => $_SESSION["user_id"]]);
     $emailMittente = $stmt->fetchColumn();
 
     // Destinatario
     // Nome del destinatario
-    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `nome` = :nome AND `cognome` = :cognome");
-    $stmt -> bindValue(":nome", $nomeDestinatario);
-    $stmt -> bindValue(":cognome", $cognomeDestinatario);
-    $stmt -> execute();
+    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
+    $stmt -> execute([":nome" => $destinatario]);
     $nomeDestinatario = $stmt->fetchColumn();
+    $nomeDestinatario = strtok($nomeDestinatario, " ");
     // Email del destinatario
-    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `nome` = :nome AND `cognome` = :cognome");
-    $stmt -> bindValue(":nome", $nomeDestinatario);
-    $stmt -> bindValue(":cognome", $cognomeDestinatario);
-    $stmt -> execute();
+    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
+    $stmt -> execute([":nome" => $destinatario]);
     $emailDestinatario = $stmt->fetchColumn();
 
     // Istanziare un oggetto PHPMailer
     $mail = new PHPMailer;
 
     // Configurazione server SMTP
-    $mail -> isSMTP(); // Utilizzare server SMTP
-    $mail -> Host = "smtp.gmail.com"; // Nome del server SMTP da utilizzare
-    $mail -> SMTPAuth = true; // Abilitazione autenticazione server SMTP
-    $mail -> Username = $emailMittente; // Indirizzo e-mail del mittente
+    $mail -> isSMTP();                             // Utilizzare server SMTP
+    $mail -> Host = "smtp.gmail.com";              // Nome del server SMTP da utilizzare
+    $mail -> SMTPAuth = true;                      // Abilitazione autenticazione server SMTP
+    $mail -> Username = $emailMittente;            // Indirizzo e-mail del mittente
     $mail -> Password = "Giuppy+1010110101010!!!"; // Password del mittente
-    $mail -> SMTPSecure = "tls"; // Abilitazione crittografia protocollo TLS
-    $mail -> Port = 587; // Connessione alla porta 587
+    $mail -> SMTPSecure = "tls";                   // Abilitazione crittografia protocollo TLS
+    $mail -> Port = 587;                           // Connessione alla porta 587
 
     // Verifica di eventuali errori nella procedura di invio della e-mail
     try {
-        $mail -> setFrom($emailMittente, $nomeMittente); // Mittente
+
+        $mail -> setFrom($emailMittente, $nomeMittente);    // Mittente
         $mail -> addAddress($emailMittente, $nomeMittente); // Destinatario
 
         $mail -> Subject = $oggetto; // Oggetto
-        $mail -> Body = $corpo; // Corpo
+        $mail -> Body = $corpo;      // Corpo
 
         // Verifica dell'invio della e-mail
         if ($mail -> send()) {
@@ -181,7 +174,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "invia_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION["group_id"] == 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
@@ -216,9 +209,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class = "mb-3">
                 <label for = "destinatario" class = "form-label text-dark">Destinatario</label>
                 <select id = "destinatario" name = "destinatario" class = "form-select">
-                    <option value = "Mario Sorvillo">Mario Sorvillo</option>
-                    <option value = "Emanuele Gnoni">Emanuele Gnoni</option>
-                    <option value = "Giuseppe Carlino">Giuseppe Carlino</option>
+                    <option value = '1'>Mario Sorvillo</option>
+                    <option value = '2'>Emanuele Gnoni</option>
                 </select>
             </div>
             <div class = "mb-3">
