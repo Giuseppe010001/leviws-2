@@ -44,12 +44,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Destinatario
     // Nome del destinatario
     $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
-    $stmt -> execute([":nome" => $destinatario]);
+    $stmt -> execute([":id" => $destinatario]);
     $nomeDestinatario = $stmt->fetchColumn();
     $nomeDestinatario = strtok($nomeDestinatario, " ");
     // Email del destinatario
     $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
-    $stmt -> execute([":nome" => $destinatario]);
+    $stmt -> execute([":id" => $destinatario]);
     $emailDestinatario = $stmt->fetchColumn();
 
     // Istanziare un oggetto PHPMailer

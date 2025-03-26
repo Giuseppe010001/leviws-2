@@ -14,7 +14,7 @@ if (!isset($_SESSION["user_id"])) {
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Gestione Utenti</title>
+    <title>Gestione Bozze</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "assets/css/datatables.min.css">
     <style>
@@ -95,7 +95,7 @@ if (!isset($_SESSION["user_id"])) {
         $(document).ready(function() {
 
             // Inizializza DataTables
-            const table = $('#usersTable').DataTable({
+            const table = $("#usersTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -108,7 +108,8 @@ if (!isset($_SESSION["user_id"])) {
                     {"data": "nome"},
                     {"data": "descrizione"},
                     {"data": "autore"},
-                    {"data": "data creazione"},
+                    {"data": "ruolo"},
+                    {"data": "data_creazione"},
                     {
                         "data": "id",
                         render: function (data) {
@@ -130,28 +131,28 @@ if (!isset($_SESSION["user_id"])) {
             // Aggiungi utente
             $("#addUser").on("click", function() {
                 $("#userForm")[0].reset();
-                $("#userId").val("");
+                $("#draftId").val("");
                 $("#userModal").modal("show");
             });
 
             // Modifica utente
             table.on("click", ".editUser", function() {
-                const userId = $(this).data("id");
-                $.get("azioni_bozza.php?action=edit&id=" + userId, function(data) {
+                const draftId = $(this).data("id");
+                $.get("azioni_bozza.php?action=edit&id=" + draftId, function(data) {
                     const user = JSON.parse(data);
-                    $("#userId").val(user.id);
-                    $("#username").val(user.username);
-                    $("#group").val(user.group_id);
+                    $("#draftId").val(user.id);
+                    $("#nome").val(user.nome);
+                    $("#descrizione").val(user.descrizione);
                     $("#userModal").modal("show");
                 });
             });
 
             // Elimina utente
             table.on("click", ".deleteUser", function() {
-                const userId = $(this).data("id");
+                const draftId = $(this).data("id");
                 const username = $(this).parents("tr").find("td:eq(1)").text();
                 if (confirm("Sei sicuro di voler eliminare la bozza: " + username + '?')) {
-                    $.post("azioni_bozza.php?action=delete", { id: userId }, function() {
+                    $.post("azioni_bozza.php?action=delete", { id: draftId }, function() {
                         table.ajax.reload();
                     });
                 }
@@ -208,7 +209,8 @@ if (!isset($_SESSION["user_id"])) {
                     <th>Nome</th>
                     <th>Descrizione</th>
                     <th>Autore</th>
-                    <th>Data creazione</th>
+                    <th>Ruolo</th>
+                    <th>Data creazione/ultima modifica</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
@@ -218,7 +220,8 @@ if (!isset($_SESSION["user_id"])) {
                     <th>Nome</th>
                     <th>Descrizione</th>
                     <th>Autore</th>
-                    <th>Data creazione</th>
+                    <th>Ruolo</th>
+                    <th>Data creazione/ultima modifica</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -235,7 +238,8 @@ if (!isset($_SESSION["user_id"])) {
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
-                            <input type = "hidden" id = "userId" name = "userId">
+                            <input type = "hidden" id = "draftId" name = "draftId">
+                            <input type = "hidden" id = "userId" name = "userId" value=<?php echo $_SESSION["user_id"]?>>
                             <div class = "mb-3">
                                 <label for = "nome" class = "form-label">Nome</label>
                                 <input type = "text" class = "form-control" id = "nome" name = "nome" required>
@@ -243,6 +247,13 @@ if (!isset($_SESSION["user_id"])) {
                             <div class = "mb-3">
                                 <label for = "descrizione" class = "form-label">Descrizione</label>
                                 <textarea type = "text" class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "ruolo" class = "form-label">Ruolo</label>
+                                <select id = "ruolo" name = "ruolo" class = "form-select">
+                                    <option value = "Referente di Viaggio">Referente di Viaggio</option>
+                                    <option value = "Accompagnatore">Accompagnatore</option>
+                                </select>
                             </div>
                         </div>
                         <div class = "modal-footer">
