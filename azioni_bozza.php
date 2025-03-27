@@ -18,7 +18,7 @@ if ($action == "read") {
     $orderDirection = isset($_POST["order"][0]["dir"]) && in_array($_POST["order"][0]["dir"], ["asc", "desc"]) ? $_POST["order"][0]["dir"] : "asc";
 
     // Array di mappatura colonne (per ordinamento)
-    $columns = ["id", "nome", "descrizione", "autore", "ruolo", "data_creazione"];
+    $columns = ["id", "nome", "descrizione", "valida"];
 
     // Configurazione iniziale della tabella di gestione bozze
     if (!empty($searchValue)) {
@@ -33,11 +33,11 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT b.id, b.nome, b.descrizione, d.nome as autore, e.ruolo, e.data as data_creazione FROM `bozza` b LEFT JOIN (`effettua` e LEFT JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id";
+    $query = "SELECT id, nome, descrizione, validita as valida FROM bozza";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE b.nome LIKE :search OR d.nome LIKE :search OR e.ruolo LIKE :search";
+        $query .= " WHERE nome LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` b LEFT JOIN (`effettua` e LEFT JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id WHERE b.nome LIKE :search OR d.nome LIKE :search OR e.ruolo LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` WHERE nome LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();
@@ -93,6 +93,7 @@ if ($action == "read") {
     $nome = $_POST["nome"];
     $descrizione = $_POST["descrizione"];
     $ruolo = $_POST["ruolo"];
+    $valida = $_POST["valida"] ?? "No";
 
     // Ricavare il docente autore
     $stmt = $pdo->prepare("SELECT `id` FROM `docente` WHERE `rifUtente` = :rif");
@@ -102,16 +103,16 @@ if ($action == "read") {
     if ($id) {
 
         // Aggiornamento bozza
-        $stmt = $pdo->prepare("UPDATE `bozza` SET `nome` = :nome, `descrizione` = :descrizione WHERE `id` = :id");
-        $stmt -> execute([":nome" => $nome, ":descrizione" => $descrizione, ":id" => $id]);
+        $stmt = $pdo->prepare("UPDATE `bozza` SET `nome` = :nome, `descrizione` = :descrizione, `validita` = :validita WHERE `id` = :id");
+        $stmt -> execute([":nome" => $nome, ":descrizione" => $descrizione, ":validita" => $valida, ":id" => $id]);
         $stmt = $pdo->prepare("INSERT INTO `effettua` (`data`, `ruolo`, `rifDocente`, `rifBozza`) VALUES (:data, :ruolo, :rifD, :rifB)");
         $stmt -> execute([":data" => date("d/m/Y H:i:s", time()), ":ruolo" => $ruolo, ":rifD" => $rifD, ":rifB" => $id]);
 
     } else {
 
         // Creazione bozza
-        $stmt = $pdo->prepare("INSERT INTO `bozza` (`nome`, `descrizione`) VALUES (:nome, :descrizione)");
-        $stmt -> execute([":nome" => $nome, ":descrizione" => $descrizione]);
+        $stmt = $pdo->prepare("INSERT INTO `bozza` (`nome`, `descrizione`, `validita`) VALUES (:nome, :descrizione, :validita)");
+        $stmt -> execute([":nome" => $nome, ":descrizione" => $descrizione, ":validita" => $valida]);
         $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `bozza`");
         $stmt -> execute();
         $rifB = $stmt->fetchColumn();
@@ -122,8 +123,8 @@ if ($action == "read") {
 // Eliminazione bozza
 } elseif ($action == "delete") {
     $id = $_POST["id"];
-    $stmt = $pdo->prepare("DELETE FROM `effettua` WHERE `rifBozza` = :rif LIMIT 1");
+    $stmt = $pdo->prepare("DELETE FROM `effettua` WHERE `rifBozza` = :rif");
     $stmt -> execute([":rif" => $id]);
-    $stmt = $pdo->prepare("DELETE FROM `bozza` WHERE `id` = :id LIMIT 1");
+    $stmt = $pdo->prepare("DELETE FROM `bozza` WHERE `id` = :id");
     $stmt -> execute([":id" => $id]);
 }

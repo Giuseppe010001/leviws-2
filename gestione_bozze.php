@@ -64,12 +64,96 @@ if (!isset($_SESSION["user_id"])) {
                 font-size: 8px;
             }
         }
+        @media screen and (max-width: 992px) {
+            .navbar-nav {
+                display: none; /* Nasconde i link della navbar */
+            }
+
+            .menu-toggle {
+                display: block; /* Mostra il pulsante per aprire il menu laterale */
+            }
+        }
+        @media screen and (min-width: 993px) {
+            .sidebar {
+                left: -250px !important; /* Nasconde il menu laterale quando la finestra è larga */
+            }
+
+            .overlay {
+                display: none !important; /* Nasconde l'overlay */
+            }
+        }
+
+        /* Nascondere completamente il men quando la navbar e' visibile */
+        @media (min-width: 992px) {
+            .menu-toggle, .sidebar, .overlay {
+                display: none !important;
+            }
+        }
+
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s;
-            transform: scale(1.1)
+            transition-duration: 1s
         }
+        #nav-titolo:hover, .nav-elemento:hover {
+            text-decoration: underline;
+        }
+
+        /* MENU LATERALE */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Nasconde inizialmente il menu al di fuori dello schermo del dispositivo */
+            width: 250px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Bottone per aprire il menu (vicino alla GIF) */
+        .menu-toggle {
+            position: absolute;
+            padding: 4px;
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            z-index: 1100;
+        }
+        .menu-toggle:hover {
+            color: white;
+            background-color: black;
+            transition-duration: 1s
+        }
+
+        /* Sfondo scuro per chiudere il menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+        }
+
         .transizioneInizio {
             display: none
         }
@@ -81,7 +165,14 @@ if (!isset($_SESSION["user_id"])) {
         }
         .boxGestioneBozze {
             position: absolute;
-            bottom: 10%;
+            bottom: 25%;
+            width: 85%;
+            height: 25%
+        }
+        .boxGestioneBozzeCronologia {
+            display: none;
+            position: absolute;
+            bottom: 25%;
             width: 85%;
             height: 25%
         }
@@ -92,10 +183,42 @@ if (!isset($_SESSION["user_id"])) {
     <script src = "assets/js/dataTables.bootstrap5.js"></script>
     <script src = "assets/js/leviws-2Script.js"></script>
     <script>
+        $(document).ready(function () {
+            function checkNavbar() {
+                if ($(window).width() >= 992) {
+                    $(".sidebar").hide(); // Nascondo inizialmente il menu
+                    $(".overlay").hide();
+                } else {
+                    $(".sidebar").show();
+                }
+            }
+
+            // Apri il menu al click quando si riduce la finestra
+            $(".menu-toggle").click(function () {
+                if ($(window).width() < 992) {
+                    $(".sidebar").css("left", "0");
+                    $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
+                }
+            });
+
+            // Chiudi il menu se clicco al di fuori di esso
+            $(".overlay").click(function () {
+                $(".sidebar").css("left", "-250px");
+                $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
+            });
+
+            // Controlla la larghezza della finestra quando cambia dimensione
+            $(window).resize(checkNavbar);
+
+            // Controlla subito all'apertura della pagina
+            checkNavbar();
+        });
+    </script>
+    <script>
         $(document).ready(function() {
 
             // Inizializza DataTables
-            const table = $("#usersTable").DataTable({
+            const table = $("#draftsTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -107,9 +230,7 @@ if (!isset($_SESSION["user_id"])) {
                     {"data": "id"},
                     {"data": "nome"},
                     {"data": "descrizione"},
-                    {"data": "autore"},
-                    {"data": "ruolo"},
-                    {"data": "data_creazione"},
+                    {"data": "valida"},
                     {
                         "data": "id",
                         render: function (data) {
@@ -127,43 +248,77 @@ if (!isset($_SESSION["user_id"])) {
                     "url": "includes/it-IT.json"
                 }
             });
+            const story = $("#draftsStoryTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "azioni_bozza_cronologia.php?action=read", // Script PHP per ottenere i dati
+                    "type": "POST"
+                },
+                "columns": [
 
-            // Aggiungi utente
-            $("#addUser").on("click", function() {
-                $("#userForm")[0].reset();
-                $("#draftId").val("");
-                $("#userModal").modal("show");
+                    {"data": "id"},
+                    {"data": "docente"},
+                    {"data": "ruolo"},
+                    {"data": "data_creazione"}
+                ],
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],  // Opzioni di paginazione
+                language: {                   // Testo personalizzato per l'interfaccia
+                    "url": "includes/it-IT.json"
+                }
             });
 
-            // Modifica utente
+            // Aggiungi bozza
+            $("#addDraft").on("click", function() {
+                $("#draftForm")[0].reset();
+                $("#draftId").val("");
+                $("#draftModal").modal("show");
+            });
+
+            // Mostra cronologia
+            $("#showStory").on("click", function() {
+                $(".boxGestioneBozze").hide();
+                story.ajax.reload();
+                $(".boxGestioneBozzeCronologia").show();
+            });
+
+            // Mostra bozze
+            $("#goBack").on("click", function() {
+                $(".boxGestioneBozzeCronologia").hide();
+                $(".boxGestioneBozze").show();
+            });
+
+            // Modifica bozza
             table.on("click", ".editUser", function() {
                 const draftId = $(this).data("id");
                 $.get("azioni_bozza.php?action=edit&id=" + draftId, function(data) {
-                    const user = JSON.parse(data);
-                    $("#draftId").val(user.id);
-                    $("#nome").val(user.nome);
-                    $("#descrizione").val(user.descrizione);
-                    $("#userModal").modal("show");
+                    const draft = JSON.parse(data);
+                    $("#draftId").val(draft.id);
+                    $("#nome").val(draft.nome);
+                    $("#descrizione").val(draft.descrizione);
+                    $("#draftModal").modal("show");
                 });
             });
 
-            // Elimina utente
+            // Elimina bozza
             table.on("click", ".deleteUser", function() {
                 const draftId = $(this).data("id");
-                const username = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare la bozza: " + username + '?')) {
+                const nome = $(this).parents("tr").find("td:eq(1)").text();
+                if (confirm("Sei sicuro di voler eliminare la bozza: " + nome + '?')) {
                     $.post("azioni_bozza.php?action=delete", { id: draftId }, function() {
                         table.ajax.reload();
                     });
                 }
             });
 
-            // Salva utente (Creazione o Modifica)
-            $("#userForm").on("submit", function(e) {
+            // Salva bozza (Creazione o Modifica)
+            $("#draftForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
                 $.post("azioni_bozza.php?action=save", formData, function() {
-                    $("#userModal").modal("hide");
+                    $("#draftModal").modal("hide");
                     table.ajax.reload();
                 });
             });
@@ -171,6 +326,25 @@ if (!isset($_SESSION["user_id"])) {
     </script>
 </head>
 <body>
+
+<!-- Pulsante menu accanto alla GIF -->
+<button class = "menu-toggle">☰</button>
+
+<!-- MENU LATERALE -->
+<div class = "sidebar">
+    <a href = "home.php">Home</a>
+    <a href = "compila_proposta.php">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php">Gestione utenti</a>
+    <a href = "gestione_bozze.php">Gestione bozze</a>
+    <a href = "invia_relazione.php">Compila relazione</a>
+    <a href = "contatti.php">Contatti</a>
+    <a href = "logout.php">Log out</a>
+</div>
+
+<!-- Overlay per chiudere il menu -->
+<div class = "overlay"></div>
+
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
         <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
@@ -179,7 +353,9 @@ if (!isset($_SESSION["user_id"])) {
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                <?php if ($_SESSION["group_id"] == 1): ?>
+                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                <?php endif; ?>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
                 <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
                 <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
@@ -199,18 +375,16 @@ if (!isset($_SESSION["user_id"])) {
         </table>
     </div>
     <div class = "boxGestioneBozze">
-        <h2 class = "text-center text-light">Gestione Bozze</h2>
         <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Bozza</button>
-            <table id = "usersTable" class = "table table-striped">
+            <button id = "addDraft" class = "btn btn-primary mb-3">Aggiungi Bozza</button>
+            <button id = "showStory" class = "btn btn-info mb-3">Cronologia</button>
+            <table id = "draftsTable" class = "table table-striped">
                 <thead>
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Descrizione</th>
-                    <th>Autore</th>
-                    <th>Ruolo</th>
-                    <th>Data creazione/ultima modifica</th>
+                    <th>Validità</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
@@ -219,9 +393,7 @@ if (!isset($_SESSION["user_id"])) {
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Descrizione</th>
-                    <th>Autore</th>
-                    <th>Ruolo</th>
-                    <th>Data creazione/ultima modifica</th>
+                    <th>Validità</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -229,24 +401,24 @@ if (!isset($_SESSION["user_id"])) {
         </div>
 
         <!-- Modale per Creazione/Modifica Utenti -->
-        <div class = "modal fade" id = "userModal" tabindex = "-1" aria-labelledby = "userModalLabel" aria-hidden = "true">
+        <div class = "modal fade" id = "draftModal" tabindex = "-1" aria-labelledby = "draftModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
                 <div class = "modal-content">
-                    <form id = "userForm">
+                    <form id = "draftForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Bozza</h5>
+                            <h5 class = "modal-title" id = "draftModalLabel">Gestisci Bozza</h5>
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
                             <input type = "hidden" id = "draftId" name = "draftId">
-                            <input type = "hidden" id = "userId" name = "userId" value=<?php echo $_SESSION["user_id"]?>>
+                            <input type = "hidden" id = "userId" name = "userId" value = <?php echo $_SESSION["user_id"]?>>
                             <div class = "mb-3">
                                 <label for = "nome" class = "form-label">Nome</label>
                                 <input type = "text" class = "form-control" id = "nome" name = "nome" required>
                             </div>
                             <div class = "mb-3">
                                 <label for = "descrizione" class = "form-label">Descrizione</label>
-                                <textarea type = "text" class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
+                                <textarea class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
                             </div>
                             <div class = "mb-3">
                                 <label for = "ruolo" class = "form-label">Ruolo</label>
@@ -254,6 +426,10 @@ if (!isset($_SESSION["user_id"])) {
                                     <option value = "Referente di Viaggio">Referente di Viaggio</option>
                                     <option value = "Accompagnatore">Accompagnatore</option>
                                 </select>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "valida" class = "form-label">Valida</label>
+                                <input type = "checkbox" class = "form-check-input" id = "valida" name = "valida" value = "Sì">
                             </div>
                         </div>
                         <div class = "modal-footer">
@@ -263,6 +439,29 @@ if (!isset($_SESSION["user_id"])) {
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class = "boxGestioneBozzeCronologia">
+        <div class = "container mt-5 p-2 bg-light border rounded">
+            <button id = "goBack" class = "btn btn-info mb-3">Indietro</button>
+            <table id = "draftsStoryTable" class = "table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Docente</th>
+                    <th>Ruolo</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>ID</th>
+                    <th>Docente</th>
+                    <th>Ruolo</th>
+                    <th>Data</th>
+                </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 </div>

@@ -14,7 +14,7 @@ if (!isset($_SESSION["user_id"])) {
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Gestione Proposte</title>
+    <title>Gestione Utenti</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "assets/css/datatables.min.css">
     <style>
@@ -64,12 +64,96 @@ if (!isset($_SESSION["user_id"])) {
                 font-size: 8px;
             }
         }
+        @media screen and (max-width: 992px) {
+            .navbar-nav {
+                display: none; /* Nasconde i link della navbar */
+            }
+
+            .menu-toggle {
+                display: block; /* Mostra il pulsante per aprire il menu laterale */
+            }
+        }
+        @media screen and (min-width: 993px) {
+            .sidebar {
+                left: -250px !important; /* Nasconde il menu laterale quando la finestra è larga */
+            }
+
+            .overlay {
+                display: none !important; /* Nasconde l'overlay */
+            }
+        }
+
+        /* Nascondere completamente il men quando la navbar e' visibile */
+        @media (min-width: 992px) {
+            .menu-toggle, .sidebar, .overlay {
+                display: none !important;
+            }
+        }
+
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s;
-            transform: scale(1.1)
+            transition-duration: 1s
         }
+        #nav-titolo:hover, .nav-elemento:hover {
+            text-decoration: underline;
+        }
+
+        /* MENU LATERALE */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Nasconde inizialmente il menu al di fuori dello schermo del dispositivo */
+            width: 250px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Bottone per aprire il menu (vicino alla GIF) */
+        .menu-toggle {
+            position: absolute;
+            padding: 4px;
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            z-index: 1100;
+        }
+        .menu-toggle:hover {
+            color: white;
+            background-color: black;
+            transition-duration: 1s
+        }
+
+        /* Sfondo scuro per chiudere il menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+        }
+
         .transizioneInizio {
             display: none
         }
@@ -81,7 +165,7 @@ if (!isset($_SESSION["user_id"])) {
         }
         .boxGestioneUtenti {
             position: absolute;
-            bottom: 10%;
+            bottom: 25%;
             width: 85%;
             height: 25%
         }
@@ -92,6 +176,38 @@ if (!isset($_SESSION["user_id"])) {
     <script src = "assets/js/dataTables.bootstrap5.js"></script>
     <script src = "assets/js/leviws-2Script.js"></script>
     <script>
+        $(document).ready(function () {
+            function checkNavbar() {
+                if ($(window).width() >= 992) {
+                    $(".sidebar").hide(); // Nascondo inizialmente il menu
+                    $(".overlay").hide();
+                } else {
+                    $(".sidebar").show();
+                }
+            }
+
+            // Apri il menu al click quando si riduce la finestra
+            $(".menu-toggle").click(function () {
+                if ($(window).width() < 992) {
+                    $(".sidebar").css("left", "0");
+                    $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
+                }
+            });
+
+            // Chiudi il menu se clicco al di fuori di esso
+            $(".overlay").click(function () {
+                $(".sidebar").css("left", "-250px");
+                $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
+            });
+
+            // Controlla la larghezza della finestra quando cambia dimensione
+            $(window).resize(checkNavbar);
+
+            // Controlla subito all'apertura della pagina
+            checkNavbar();
+        });
+    </script>
+    <script>
         $(document).ready(function() {
 
             // Inizializza DataTables
@@ -99,7 +215,7 @@ if (!isset($_SESSION["user_id"])) {
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_proposta.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_utente.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
@@ -138,7 +254,7 @@ if (!isset($_SESSION["user_id"])) {
             // Modifica utente
             table.on("click", ".editUser", function() {
                 const userId = $(this).data("id");
-                $.get("azioni_proposta.php?action=edit&id=" + userId, function(data) {
+                $.get("azioni_utente.php?action=edit&id=" + userId, function(data) {
                     const user = JSON.parse(data);
                     $("#docenteBlocco").hide();
                     $("#userId").val(user.id);
@@ -153,7 +269,7 @@ if (!isset($_SESSION["user_id"])) {
                 const userId = $(this).data("id");
                 const username = $(this).parents("tr").find("td:eq(3)").text();
                 if (confirm("Sei sicuro di voler eliminare l\'utente: " + username + '?')) {
-                    $.post("azioni_proposta.php?action=delete", { id: userId }, function() {
+                    $.post("azioni_utente.php?action=delete", { id: userId }, function() {
                         table.ajax.reload();
                     });
                 }
@@ -163,7 +279,7 @@ if (!isset($_SESSION["user_id"])) {
             $("#userForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
-                $.post("azioni_proposta.php?action=save", formData, function() {
+                $.post("azioni_utente.php?action=save", formData, function() {
                     $("#userModal").modal("hide");
                     table.ajax.reload();
                 });
@@ -172,6 +288,25 @@ if (!isset($_SESSION["user_id"])) {
     </script>
 </head>
 <body>
+
+<!-- Pulsante menu accanto alla GIF -->
+<button class = "menu-toggle">☰</button>
+
+<!-- MENU LATERALE -->
+<div class = "sidebar">
+    <a href = "home.php">Home</a>
+    <a href = "compila_proposta.php">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php">Gestione utenti</a>
+    <a href = "gestione_bozze.php">Gestione bozze</a>
+    <a href = "invia_relazione.php">Compila relazione</a>
+    <a href = "contatti.php">Contatti</a>
+    <a href = "logout.php">Log out</a>
+</div>
+
+<!-- Overlay per chiudere il menu -->
+<div class = "overlay"></div>
+
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
         <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
@@ -200,9 +335,8 @@ if (!isset($_SESSION["user_id"])) {
         </table>
     </div>
     <div class = "boxGestioneUtenti">
-        <h2 class = "text-center text-light">Gestione Proposte</h2>
         <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Proposta</button>
+            <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Utente</button>
             <table id = "usersTable" class = "table table-striped">
                 <thead>
                 <tr>
@@ -231,7 +365,7 @@ if (!isset($_SESSION["user_id"])) {
                 <div class = "modal-content">
                     <form id = "userForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Proposta</h5>
+                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Utente</h5>
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
