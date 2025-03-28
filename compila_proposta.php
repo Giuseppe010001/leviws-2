@@ -14,7 +14,7 @@ if (!isset($_SESSION["user_id"])) {
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Gestione Utenti</title>
+    <title>Gestione Bozze</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "assets/css/datatables.min.css">
     <style>
@@ -163,7 +163,14 @@ if (!isset($_SESSION["user_id"])) {
             width: 85%;
             height: 33.48%
         }
-        .boxGestioneUtenti {
+        .boxGestioneBozze {
+            position: absolute;
+            bottom: 25%;
+            width: 85%;
+            height: 25%
+        }
+        .boxGestioneBozzeStorico {
+            display: none;
             position: absolute;
             bottom: 25%;
             width: 85%;
@@ -211,19 +218,19 @@ if (!isset($_SESSION["user_id"])) {
         $(document).ready(function() {
 
             // Inizializza DataTables
-            const table = $("#usersTable").DataTable({
+            const table = $("#draftsTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_utente.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_bozza.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
 
                     {"data": "id"},
-                    {"data": "docente"},
-                    {"data": "username"},
-                    {"data": "group_name"},
+                    {"data": "nome"},
+                    {"data": "descrizione"},
+                    {"data": "valida"},
                     {
                         "data": "id",
                         render: function (data) {
@@ -241,46 +248,77 @@ if (!isset($_SESSION["user_id"])) {
                     "url": "includes/it-IT.json"
                 }
             });
+            const story = $("#draftsStoryTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "azioni_bozza_storico.php?action=read", // Script PHP per ottenere i dati
+                    "type": "POST"
+                },
+                "columns": [
 
-            // Aggiungi utente
-            $("#addUser").on("click", function() {
-                $("#docenteBlocco").show();
-                $("#userForm")[0].reset();
-                $("#userId").val("");
-                $("#password").prop("required", true);
-                $("#userModal").modal("show");
+                    {"data": "id"},
+                    {"data": "docente"},
+                    {"data": "ruolo"},
+                    {"data": "data_creazione"}
+                ],
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],  // Opzioni di paginazione
+                language: {                   // Testo personalizzato per l'interfaccia
+                    "url": "includes/it-IT.json"
+                }
             });
 
-            // Modifica utente
+            // Aggiungi bozza
+            $("#addDraft").on("click", function() {
+                $("#draftForm")[0].reset();
+                $("#draftId").val("");
+                $("#draftModal").modal("show");
+            });
+
+            // Mostra storico
+            $("#showStory").on("click", function() {
+                $(".boxGestioneBozze").hide();
+                story.ajax.reload();
+                $(".boxGestioneBozzeStorico").show();
+            });
+
+            // Mostra bozze
+            $("#goBack").on("click", function() {
+                $(".boxGestioneBozzeStorico").hide();
+                $(".boxGestioneBozze").show();
+            });
+
+            // Modifica bozza
             table.on("click", ".editUser", function() {
-                const userId = $(this).data("id");
-                $.get("azioni_utente.php?action=edit&id=" + userId, function(data) {
-                    const user = JSON.parse(data);
-                    $("#docenteBlocco").hide();
-                    $("#userId").val(user.id);
-                    $("#username").val(user.username);
-                    $("#password").prop("required", false);
-                    $("#userModal").modal("show");
+                const draftId = $(this).data("id");
+                $.get("azioni_bozza.php?action=edit&id=" + draftId, function(data) {
+                    const draft = JSON.parse(data);
+                    $("#draftId").val(draft.id);
+                    $("#nome").val(draft.nome);
+                    $("#descrizione").val(draft.descrizione);
+                    $("#draftModal").modal("show");
                 });
             });
 
-            // Elimina utente
+            // Elimina bozza
             table.on("click", ".deleteUser", function() {
-                const userId = $(this).data("id");
-                const username = $(this).parents("tr").find("td:eq(3)").text();
-                if (confirm("Sei sicuro di voler eliminare l\'utente: " + username + '?')) {
-                    $.post("azioni_utente.php?action=delete", { id: userId }, function() {
+                const draftId = $(this).data("id");
+                const nome = $(this).parents("tr").find("td:eq(1)").text();
+                if (confirm("Sei sicuro di voler eliminare la bozza: " + nome + '?')) {
+                    $.post("azioni_bozza.php?action=delete", { id: draftId }, function() {
                         table.ajax.reload();
                     });
                 }
             });
 
-            // Salva utente (Creazione o Modifica)
-            $("#userForm").on("submit", function(e) {
+            // Salva bozza (Creazione o Modifica)
+            $("#draftForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
-                $.post("azioni_utente.php?action=save", formData, function() {
-                    $("#userModal").modal("hide");
+                $.post("azioni_bozza.php?action=save", formData, function() {
+                    $("#draftModal").modal("hide");
                     table.ajax.reload();
                 });
             });
@@ -315,7 +353,9 @@ if (!isset($_SESSION["user_id"])) {
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
                 <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                <?php if ($_SESSION["group_id"] == 1): ?>
+                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                <?php endif; ?>
                 <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
                 <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
                 <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
@@ -334,25 +374,33 @@ if (!isset($_SESSION["user_id"])) {
             </tr>
         </table>
     </div>
-    <div class = "boxGestioneUtenti">
+    <div class = "boxGestioneBozze">
         <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Utente</button>
-            <table id = "usersTable" class = "table table-striped">
+            <button id = "showStory" class = "btn btn-info mb-3">Storico</button>
+            <table id = "draftsTable" class = "table table-striped">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Docente</th>
-                    <th>Username</th>
-                    <th>Gruppo</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
+                    <th>Data inizio</th>
+                    <th>Data Fine</th>
+                    <th>Mezzo</th>
+                    <th>Destinazione</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
                     <th>ID</th>
-                    <th>Docente</th>
-                    <th>Username</th>
-                    <th>Gruppo</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Descrizione</th>
+                    <th>Data inizio</th>
+                    <th>Data Fine</th>
+                    <th>Mezzo</th>
+                    <th>Destinazione</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -360,34 +408,50 @@ if (!isset($_SESSION["user_id"])) {
         </div>
 
         <!-- Modale per Creazione/Modifica Utenti -->
-        <div class = "modal fade" id = "userModal" tabindex = "-1" aria-labelledby = "userModalLabel" aria-hidden = "true">
+        <div class = "modal fade" id = "draftModal" tabindex = "-1" aria-labelledby = "draftModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
                 <div class = "modal-content">
-                    <form id = "userForm">
+                    <form id = "draftForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Utente</h5>
+                            <h5 class = "modal-title" id = "draftModalLabel">Gestisci Proposta</h5>
                             <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
-                            <input type = "hidden" id = "userId" name = "userId">
-                            <div id = "docenteBlocco" class = "mb-3">
-                                <label for = "docente" class = "form-label">Docente</label>
-                                <input type = "text" class = "form-control" id = "docente" name = "docente" placeholder = "Nome Cognome" required>
+                            <input type = "hidden" id = "draftId" name = "draftId">
+                            <div class = "mb-3">
+                                <label for = "nome" class = "form-label">Nome</label>
+                                <input type = "text" class = "form-control" id = "nome" name = "nome" required>
                             </div>
                             <div class = "mb-3">
-                                <label for = "username" class = "form-label">Username</label>
-                                <input type = "text" class = "form-control" id = "username" name = "username" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "password" class = "form-label">Password</label>
-                                <input type = "password" class = "form-control" id = "password" name = "password">
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "group" class = "form-label">Gruppo</label>
-                                <select id = "group" name = "group" class = "form-select">
-                                    <option value = '1'>Admin</option>
-                                    <option value = '2'>Utente</option>
+                                <label for = "tipo" class = "form-label">Tipo</label>
+                                <select id = "tipo" name = "tipo" class = "form-select">
+                                    <option value = '1'>Viaggio</option>
+                                    <option value = '2'>Uscita</option>
                                 </select>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "dataInizio" class = "form-label">Data Inizio</label>
+                                <input type = "date" class = "form-control" id = "dataInizio" name = "dataInzio" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "dataFine" class = "form-label">Data Fine</label>
+                                <input type = "date" class = "form-control" id = "dataFine" name = "dataFine" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "mezzo" class = "form-label">Mezzo</label>
+                                <input type = "text" class = "form-check-input" id = "mezzo" name = "mezzo" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "destinazione" class = "form-label">Destinazione</label>
+                                <input type = "text" class = "form-check-input" id = "destinazione" name = "destinazione" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "classe" class = "form-label">Classe</label>
+                                <input type = "text" class = "form-check-input" id = "classe" name = "classe" required>
+                            </div>
+                            <div class = "mb-3">
+                                <label for = "numerosita" class = "form-label">Numerosità</label>
+                                <input type = "text" class = "form-check-input" id = "numerosita" name = "numerosita" required>
                             </div>
                         </div>
                         <div class = "modal-footer">
@@ -397,6 +461,51 @@ if (!isset($_SESSION["user_id"])) {
                     </form>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class = "boxGestioneBozzeClassi">
+        <div class = "container mt-5 p-2 bg-light border rounded">
+            <button id = "goBackClass" class = "btn btn-info mb-3">Indietro</button>
+            <table id = "draftsStoryTable" class = "table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Classe</th>
+                    <th>Numerosità</th>
+                    <th>2/3</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>ID</th>
+                    <th>Classe</th>
+                    <th>Numerosità</th>
+                    <th>2/3</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    <div class = "boxGestioneBozzeStorico">
+        <div class = "container mt-5 p-2 bg-light border rounded">
+            <button id = "goBackStory" class = "btn btn-info mb-3">Indietro</button>
+            <table id = "draftsStoryTable" class = "table table-striped">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Docente</th>
+                    <th>Ruolo</th>
+                    <th>Data</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>ID</th>
+                    <th>Docente</th>
+                    <th>Ruolo</th>
+                    <th>Data</th>
+                </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
 </div>

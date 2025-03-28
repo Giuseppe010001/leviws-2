@@ -169,7 +169,7 @@ if (!isset($_SESSION["user_id"])) {
             width: 85%;
             height: 25%
         }
-        .boxGestioneBozzeCronologia {
+        .boxGestioneBozzeStorico {
             display: none;
             position: absolute;
             bottom: 25%;
@@ -252,7 +252,7 @@ if (!isset($_SESSION["user_id"])) {
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_bozza_cronologia.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_bozza_storico.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
@@ -277,16 +277,16 @@ if (!isset($_SESSION["user_id"])) {
                 $("#draftModal").modal("show");
             });
 
-            // Mostra cronologia
+            // Mostra storico
             $("#showStory").on("click", function() {
                 $(".boxGestioneBozze").hide();
                 story.ajax.reload();
-                $(".boxGestioneBozzeCronologia").show();
+                $(".boxGestioneBozzeStorico").show();
             });
 
             // Mostra bozze
             $("#goBack").on("click", function() {
-                $(".boxGestioneBozzeCronologia").hide();
+                $(".boxGestioneBozzeStorico").hide();
                 $(".boxGestioneBozze").show();
             });
 
@@ -377,7 +377,7 @@ if (!isset($_SESSION["user_id"])) {
     <div class = "boxGestioneBozze">
         <div class = "container mt-5 p-2 bg-light border rounded">
             <button id = "addDraft" class = "btn btn-primary mb-3">Aggiungi Bozza</button>
-            <button id = "showStory" class = "btn btn-info mb-3">Cronologia</button>
+            <button id = "showStory" class = "btn btn-info mb-3">Storico</button>
             <table id = "draftsTable" class = "table table-striped">
                 <thead>
                 <tr>
@@ -441,7 +441,7 @@ if (!isset($_SESSION["user_id"])) {
             </div>
         </div>
     </div>
-    <div class = "boxGestioneBozzeCronologia">
+    <div class = "boxGestioneBozzeStorico">
         <div class = "container mt-5 p-2 bg-light border rounded">
             <button id = "goBack" class = "btn btn-info mb-3">Indietro</button>
             <table id = "draftsStoryTable" class = "table table-striped">

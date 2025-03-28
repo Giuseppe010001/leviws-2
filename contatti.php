@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail -> Host = "smtp.gmail.com";              // Nome del server SMTP da utilizzare
     $mail -> SMTPAuth = true;                      // Abilitazione autenticazione server SMTP
     $mail -> Username = $emailMittente;            // Indirizzo e-mail del mittente
-    $mail -> Password = "Giuppy+1010110101010!!!"; // Password del mittente
+    $mail -> Password = "";                        // Password di autorizzazione del mittente
     $mail -> SMTPSecure = "tls";                   // Abilitazione crittografia protocollo TLS
     $mail -> Port = 587;                           // Connessione alla porta 587
 
