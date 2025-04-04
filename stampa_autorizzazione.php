@@ -31,8 +31,8 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
             background-attachment: fixed
         }
         td {
-            padding-top: 50px;
-            padding-left: 5px
+            padding-top: 40px;
+            padding-left: 70px
         }
         #nav-titolo {
             color: white;
@@ -85,9 +85,9 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
             width: 85%;
             height: 33.48%
         }
-        .boxCompilaModulo {
+        .boxScaricaAutorizzazione {
             position: absolute;
-            bottom: 10%;
+            bottom: 15%;
             width: 85%;
             height: 25%
         }
@@ -126,11 +126,23 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
             </tr>
         </table>
     </div>
-    <div class = "boxCompilaModulo">
-        <h2 class = "text-center text-light">Compila Modulo</h2>
-        <form action = "genera_modulo_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 250px; max-height: 100px">
-            <button type = "submit" class = "btn btn-primary w-100">Scarica PDF</button>
-        </form>
+    <div class = "boxScaricaAutorizzazione">
+        <table>
+           <tr>
+               <td>
+                   <h4 class = "text-center text-light">Autorizzazione Viaggio/visita d'istruzione</h4>
+                   <form action = "genera_modulo_Visita_Viaggio_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 250px; max-height: 100px">
+                       <button type = "submit" class = "btn btn-primary w-100">Scarica PDF</button>
+                   </form>
+               </td>
+               <td>
+                   <h4 class = "text-center text-light">Autorizzazione Uscita didattica</h4>
+                   <form action = "genera_modulo_Uscita_Didattica_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 250px; max-height: 100px">
+                       <button type = "submit" class = "btn btn-primary w-100">Scarica PDF</button>
+                   </form>
+               </td>
+           </tr>
+        </table>
     </div>
 </div>
 </body>

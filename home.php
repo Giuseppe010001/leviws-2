@@ -39,6 +39,8 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         #nav-titolo {
             color: white;
             text-decoration: none
+            padding: 20px;
+            margin: 1%;
         }
         @media screen and (min-width: 1920px) and (max-width: 3840px) {
             #nav-titolo {
@@ -72,35 +74,92 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 font-size: 8px;
             }
         }
-        #nav-titolo:hover, .nav-elemento:hover {
-            color: white;
-            background-color: black;
-            transition-duration: 1s;
-            transform: scale(1.1)
+
+        @media screen and (max-width: 992px) {
+            .navbar-nav {
+                display: none; /* Nasconde i link della navbar */
+            }
+
+            .menu-toggle {
+                display: block; /* Mostra il pulsante per aprire il menu laterale */
+            }
         }
+
+        @media screen and (min-width: 993px) {
+            .sidebar {
+                left: -250px !important; /* Nasconde il menu laterale quando la finestra è larga */
+            }
+
+            .overlay {
+                display: none !important; /* Nasconde l'overlay */
+            }
+        }
+
+        /* Nascondere completamente il men quando la navbar e' visibile */
+        @media (min-width: 992px) {
+            .menu-toggle, .sidebar, .overlay {
+                display: none !important;
+            }
+        }
+
         .transizioneInizio {
-            display: none
+            display: none;
         }
-        #nav-titolo:hover, .nav-elemento:hover {
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* MENU LATERALE */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Nasconde inizialmente il menu al di fuori dello schermo del dispositivo */
+            width: 250px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
             color: white;
-            background-color: black;
-            transition-duration: 1s
+            text-decoration: none;
+            font-size: 18px;
         }
-        .transizioneInizio {
-            display: none
+
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
-        .boxLoghi {
+
+        /* Bottone per aprire il menu (vicino alla GIF) */
+        .menu-toggle {
             position: absolute;
-            bottom: 55%;
-            width: 85%;
-            height: 33.48%
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            z-index: 1100;
         }
-        .boxSaluto {
-            position: absolute;
-            bottom: 5%;
-            width: 85%;
-            height: 25%
+
+        /* Sfondo scuro per chiudere il menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
         }
+
     </style>
     <script src = "assets/js/jquery-3.7.1.js"></script>
     <script src = "assets/js/bootstrap.bundle.min.js"></script>
@@ -119,6 +178,10 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 <body>
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
+
+        <!-- Pulsante menu accanto alla GIF -->
+        <button class="menu-toggle">☰</button>
+
         <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
@@ -136,6 +199,21 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         </div>
     </div>
 </div>
+
+<!-- MENU LATERALE -->
+<div class="sidebar">
+    <a href="compila_proposta.php"> Compila proposta</a>
+    <a href="stampa_autorizzazione.php"> Stampa autorizzazione</a>
+    <a href="gestione_utenti.php"> Gestione utenti</a>
+    <a href="gestione_bozze.php"> Gestione bozze</a>
+    <a href="invia_relazione.php"> Compila relazione</a>
+    <a href="contatti.php"> Contatti</a>
+    <a href="logout.php"> Log out</a>
+</div>
+
+<!-- Overlay per chiudere il menu -->
+<div class="overlay"></div>
+
 <div class = "container">
     <div class = "boxLoghi">
         <table>
@@ -163,5 +241,37 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         ?>
     </div>
 </div>
+<script>
+    $(document).ready(function () {
+        function checkNavbar() {
+            if ($(window).width() >= 992) {
+                $(".sidebar").hide(); // Nascondo inizialmente il menu
+                $(".overlay").hide();
+            } else {
+                $(".sidebar").show();
+            }
+        }
+
+        // Apri il menu al click quando si riduce la finestra
+        $(".menu-toggle").click(function () {
+            if ($(window).width() < 992) {
+                $(".sidebar").css("left", "0");
+                $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
+            }
+        });
+
+        // Chiudi il menu se clicco al di fuori di esso
+        $(".overlay").click(function () {
+            $(".sidebar").css("left", "-250px");
+            $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
+        });
+
+        // Controlla la larghezza della finestra quando cambia dimensione
+        $(window).resize(checkNavbar);
+
+        // Controlla subito all'apertura della pagina
+        checkNavbar();
+    });
+</script>
 </body>
 </html>
