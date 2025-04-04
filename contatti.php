@@ -13,7 +13,7 @@ if (!isset($_SESSION["user_id"])) {
 }
 
 require "includes/db.php"; // Richiedere il file includes/db.php
-require 'includes/PHPMailer/PHPMailerAutoload.php'; // Richiedere il file includes/PHPMailer/PHPMailerAutoload.php
+require "includes/PHPMailer/PHPMailerAutoload.php"; // Richiedere il file includes/PHPMailer/PHPMailerAutoload.php
 
 // Dichiarazione ed implementazione variabili di conferma ed errore nell'invio della e-mail
 $sent = "";
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
     $stmt -> execute([":id" => $_SESSION["user_id"]]);
     $nomeMittente = $stmt->fetchColumn();
-    $nomeMittente = strtok($nomeMittente, " ");
+    $nomeMittente = strtok($nomeMittente, ' ');
     // Email del mittente
     $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
     $stmt -> execute(["id" => $_SESSION["user_id"]]);
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
     $stmt -> execute([":id" => $destinatario]);
     $nomeDestinatario = $stmt->fetchColumn();
-    $nomeDestinatario = strtok($nomeDestinatario, " ");
+    $nomeDestinatario = strtok($nomeDestinatario, ' ');
     // Email del destinatario
     $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
     $stmt -> execute([":id" => $destinatario]);
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $mail -> Host = "smtp.gmail.com";              // Nome del server SMTP da utilizzare
     $mail -> SMTPAuth = true;                      // Abilitazione autenticazione server SMTP
     $mail -> Username = $emailMittente;            // Indirizzo e-mail del mittente
-    $mail -> Password = "Giuppy+1010110101010!!!"; // Password del mittente
+    $mail -> Password = "";                        // Password di autorizzazione del mittente
     $mail -> SMTPSecure = "tls";                   // Abilitazione crittografia protocollo TLS
     $mail -> Port = 587;                           // Connessione alla porta 587
 
@@ -138,12 +138,96 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 font-size: 8px;
             }
         }
+        @media screen and (max-width: 992px) {
+            .navbar-nav {
+                display: none; /* Nasconde i link della navbar */
+            }
+
+            .menu-toggle {
+                display: block; /* Mostra il pulsante per aprire il menu laterale */
+            }
+        }
+        @media screen and (min-width: 993px) {
+            .sidebar {
+                left: -250px !important; /* Nasconde il menu laterale quando la finestra è larga */
+            }
+
+            .overlay {
+                display: none !important; /* Nasconde l'overlay */
+            }
+        }
+
+        /* Nascondere completamente il men quando la navbar e' visibile */
+        @media (min-width: 992px) {
+            .menu-toggle, .sidebar, .overlay {
+                display: none !important;
+            }
+        }
+
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s;
-            transform: scale(1.1)
+            transition-duration: 1s
         }
+        #nav-titolo:hover, .nav-elemento:hover {
+            text-decoration: underline;
+        }
+
+        /* MENU LATERALE */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px; /* Nasconde inizialmente il menu al di fuori dello schermo del dispositivo */
+            width: 250px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            transition: 0.3s;
+            padding-top: 60px;
+            z-index: 1000;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+        }
+        .sidebar a:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Bottone per aprire il menu (vicino alla GIF) */
+        .menu-toggle {
+            position: absolute;
+            padding: 4px;
+            top: 10px;
+            left: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: white;
+            z-index: 1100;
+        }
+        .menu-toggle:hover {
+            color: white;
+            background-color: black;
+            transition-duration: 1s
+        }
+
+        /* Sfondo scuro per chiudere il menu */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 900;
+        }
+
         .transizioneInizio {
             display: none
         }
@@ -155,7 +239,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .boxContatti {
             position: absolute;
-            bottom: 10%;
+            bottom: 18%;
             width: 85%;
             height: 25%
         }
@@ -164,10 +248,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src = "assets/js/bootstrap.bundle.min.js"></script>
     <script src = "assets/js/leviws-2Script.js"></script>
     <script>
+        $(document).ready(function () {
+            function checkNavbar() {
+                if ($(window).width() >= 992) {
+                    $(".sidebar").hide(); // Nascondo inizialmente il menu
+                    $(".overlay").hide();
+                } else {
+                    $(".sidebar").show();
+                }
+            }
 
+            // Apri il menu al click quando si riduce la finestra
+            $(".menu-toggle").click(function () {
+                if ($(window).width() < 992) {
+                    $(".sidebar").css("left", "0");
+                    $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
+                }
+            });
+
+            // Chiudi il menu se clicco al di fuori di esso
+            $(".overlay").click(function () {
+                $(".sidebar").css("left", "-250px");
+                $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
+            });
+
+            // Controlla la larghezza della finestra quando cambia dimensione
+            $(window).resize(checkNavbar);
+
+            // Controlla subito all'apertura della pagina
+            checkNavbar();
+        });
     </script>
 </head>
 <body>
+
+<!-- Pulsante menu accanto alla GIF -->
+<button class = "menu-toggle">☰</button>
+
+<!-- MENU LATERALE -->
+<div class = "sidebar">
+    <a href = "home.php">Home</a>
+    <a href = "compila_proposta.php">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php">Gestione utenti</a>
+    <a href = "gestione_bozze.php">Gestione bozze</a>
+    <a href = "invia_relazione.php">Compila relazione</a>
+    <a href = "contatti.php">Contatti</a>
+    <a href = "logout.php">Log out</a>
+</div>
+
+<!-- Overlay per chiudere il menu -->
+<div class = "overlay"></div>
+
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
         <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
@@ -198,7 +330,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
     </div>
     <div class = "boxContatti">
-        <h2 class = "text-center text-light">Contatti</h2>
         <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px;">
             <?php if ($sent): ?>
                 <div class = "alert alert-success"><?php echo $sent ?></div>

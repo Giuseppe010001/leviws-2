@@ -24,169 +24,22 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struttura della tabella `bozza`
---
-
-CREATE TABLE `bozza` (
-  `id_bozza` bigint(10) UNSIGNED NOT NULL,
-  `descrizione` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `classe`
---
-
-CREATE TABLE `classe` (
-  `id_classe` bigint(3) UNSIGNED NOT NULL,
-  `descrizione` varchar(2) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
-  `numerosita` int(2) NOT NULL,
-  `num_minimo_studenti` int(2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `coinvolge`
---
-
-CREATE TABLE `coinvolge` (
-  `relazione` blob NOT NULL
-  `rif_proposta` bigint(20) REFERENCES viaggio(id_viaggio) NOT NULL,
-  `rif_proposta` bigint(20) REFERENCES classe(id_classe) NOT NULL,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `consegue`
---
-
-CREATE TABLE `consegue` (
-  `validita_bozza` tinyint(1) NOT NULL,
-  `rif_proposta` bigint(20) REFERENCES proposta(id_proposta) NOT NULL,
-  `rif_bozza` bigint(20) REFERENCES bozza(id_bozza) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `docente`
---
-
-CREATE TABLE `docente` (
-  `id_docente` bigint(250) UNSIGNED NOT NULL,
-  `nome` varchar(30) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
-  `cognome` varchar(30) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `effettua`
---
-
-CREATE TABLE `effettua` (
-  `data` date DEFAULT NULL,
-  `ruolo` varchar(20) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
-  `rif_docente` bigint(20) REFERENCES docente(id_docente) NOT NULL,
-  `rif_bozza` bigint(20) REFERENCES bozza(id_bozza) NOT NULL,
-  
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dump dei dati per la tabella `effettua`
---
-
-INSERT INTO `effettua` (`data`, `ruolo`, `rif_docente`, `rif_bozza`) VALUES
-(NULL, 0, 0, ''),
-(NULL, 0, 0, '');
-
--- --------------------------------------------------------
-
---
 -- Struttura della tabella `gruppo`
 --
 
 CREATE TABLE `gruppo` (
-  `id` bigint(11) UNSIGNED NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `permissions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`permissions`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `nome` varchar(5) NOT NULL,
+    `permessi` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`permessi`))
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 --
 -- Dump dei dati per la tabella `gruppo`
 --
 
-INSERT INTO `gruppo` (`id`, `name`, `permissions`) VALUES
+INSERT INTO `gruppo` (`id`, `nome`, `permessi`) VALUES
 (1, 'admins', '{\"manage_users\": true, \"view_dashboard\": true, \"manage_settings\": true}'),
 (2, 'users', '{\"view_dashboard\": true}');
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `indirizzo`
---
-
-CREATE TABLE `indirizzo` (
-  `id_indirizzo` bigint(1) UNSIGNED NOT NULL,
-  `descrizione` varchar(10) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `partecipa`
---
-
-CREATE TABLE `partecipa` (
-  `relazione` varchar(300) DEFAULT NULL,
-  `rif_viaggio` bigint(20) REFERENCES viaggio(id_viaggio) NOT NULL,
-  `rif_docente` bigint(20) REFERENCES docente(id_docente) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dump dei dati per la tabella `partecipa`
---
-
-INSERT INTO `partecipa` (`relazione`, `rif_viaggio`, `rif_classe`) VALUES
-(NULL, 0, 0);
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `proposta`
---
-
-CREATE TABLE `proposta` (
-  `id_proposta` bigint(10) UNSIGNED NOT NULL,
-  `descrizione` varchar(100) CHARACTER SET armscii8 COLLATE armscii8_general_ci DEFAULT NULL,
-  `data_creazione` date DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `sotituzione`
---
-
-CREATE TABLE `sotituzione` (
-  `sostituto` tinyint(1) NOT NULL
-  `rif_proposta` bigint(20) REFERENCES proposta(id_proposta) NOT NULL,
-  `rif_docente` bigint(20) REFERENCES docente(id_docente) NOT NULL,
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Struttura della tabella `tipo`
---
-
-CREATE TABLE `tipo` (
-  `id_tipo` bigint(20) UNSIGNED NOT NULL,
-  `descrizione` varchar(30) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -195,20 +48,113 @@ CREATE TABLE `tipo` (
 --
 
 CREATE TABLE `utente` (
-  `id` bigint(11) UNSIGNED NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password_hash` varchar(255) NOT NULL,
-  `group_id` bigint(11) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `username` varchar(50) UNIQUE NOT NULL,
+    `password` varchar(255) UNIQUE NOT NULL,
+    `rifGruppo` int UNSIGNED NOT NULL,
+    CONSTRAINT `utente_ibfk_1` FOREIGN KEY (`rifGruppo`) REFERENCES `gruppo` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 --
 -- Dump dei dati per la tabella `utente`
 --
 
-INSERT INTO `utente` (`id`, `username`, `password_hash`, `group_id`) VALUES
-(1, 'admin_user', '$2y$10$6s00YYHczdd/MtQu1Ks.8eQVHFVTkfcoVnGfcFAN8adJj6jFLJQp2', 1),
-(2, 'standard_user', '$2y$10$1jK1AoMovQO8cApX.Lcc2uYor52rr.2H5QPn.7bEAtyKugNR0e6BC', 2),
-(3, 'pippo', '$2y$10$aKrgftaLq0X0H.8gkv3D3eL/cy1l.0bz79lQJ9akoWoSChevmOdu2', 2);
+INSERT INTO `utente` (`id`, `username`, `password`, `rifGruppo`) VALUES
+(1, 'OSolEOMarNapoli', '$2y$10$DEBJB8kPHTrSlQjMrPXsYubhcO5VSqqsfT6Fhbvne7TlhetF.vyAi', 1),
+(2, 'emaThreaddaJava', '$2y$10$U4bDPJopPVTJmNX2CpVQhOOoAfARGm9jsrFMH.Bqu7nIeV91C9CIy', 1),
+(3, 'InfoGep2006', '$2y$10$Ix3U6UhI2dG8IEHpNnx8Qer9lACaLhv3a72YSQqkm.a5omuxcMNYy', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `docente`
+--
+
+CREATE TABLE `docente` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `nome` varchar(50) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `email` varchar(120) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `rifUtente` int UNSIGNED NOT NULL,
+    CONSTRAINT `docente_ibfk_1` FOREIGN KEY (`rifUtente`) REFERENCES `utente` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `docente`
+--
+
+INSERT INTO `docente` (`id`, `nome`, `email`, `rifUtente`) VALUES
+(1, 'Mario Sorvillo', 'sorvillo.mario@istitutolevi.edu.it', 1),
+(2, 'Emanuele Gnoni', 'gnoni.emanuele@istitutolevi.edu.it', 2),
+(3, 'Giuseppe Carlino', 'carlino.giuseppe@istitutolevi.edu.it', 3);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `indirizzo`
+--
+
+CREATE TABLE `indirizzo` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `descrizione` varchar(4) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `indirizzo`
+--
+
+INSERT INTO `indirizzo` (`id`, `descrizione`) VALUES
+(1, 'LSSA'),
+(2, 'ITT'),
+(3, 'IPIA'),
+(4, 'IPSC');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `classe`
+--
+
+CREATE TABLE `classe` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `descrizione` varchar(2) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `numerosita` int NOT NULL,
+    `2/3` int NOT NULL,
+    `rifDocente` int UNSIGNED NOT NULL,
+    `rifIndirizzo` int UNSIGNED NOT NULL,
+    CONSTRAINT `classe_ibfk_1` FOREIGN KEY (`rifDocente`) REFERENCES `docente` (`id`),
+    CONSTRAINT `classe_ibfk_2` FOREIGN KEY (`rifIndirizzo`) REFERENCES `indirizzo` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `bozza`
+--
+
+CREATE TABLE `bozza` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `nome` varchar(30) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `descrizione` varchar(255) NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `tipo`
+--
+
+CREATE TABLE `tipo` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `descrizione` varchar(7) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+--
+-- Dump dei dati per la tabella `tipo`
+--
+
+INSERT INTO `tipo` (`id`, `descrizione`) VALUES
+(1, 'Viaggio'),
+(2, 'Uscita');
 
 -- --------------------------------------------------------
 
@@ -217,100 +163,101 @@ INSERT INTO `utente` (`id`, `username`, `password_hash`, `group_id`) VALUES
 --
 
 CREATE TABLE `viaggio` (
-  `id_viaggio` bigint(10) UNSIGNED NOT NULL,
-  `descrizione` varchar(100) CHARACTER SET armscii8 COLLATE armscii8_general_ci DEFAULT NULL,
-  `data_inizio` date NOT NULL,
-  `data_fine` date NOT NULL,
-  `mezzo` varchar(15) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
-  `destinazione` varchar(20) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `nome` varchar(30) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `descrizione` varchar(255) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `dataInizio` date NOT NULL,
+    `dataFine` date NOT NULL,
+    `mezzo` varchar(10) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `destinazione` varchar(15) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `rifTipo` int UNSIGNED NOT NULL,
+    CONSTRAINT `viaggio_ibfk_1` FOREIGN KEY (`rifTipo`) REFERENCES `tipo` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
--- Indici per le tabelle scaricate
+-- Struttura della tabella `proposta`
 --
 
---
--- Indici per le tabelle `bozza`
---
-ALTER TABLE `bozza`
-  ADD PRIMARY KEY (`id_bozza`);
+CREATE TABLE `proposta` (
+    `id` int UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `descrizione` varchar(255) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `dataCreazione` date NOT NULL,
+    `rifViaggio` int UNSIGNED NOT NULL,
+    CONSTRAINT `proposta_ibfk_1` FOREIGN KEY (`rifViaggio`) REFERENCES `viaggio` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
--- Indici per le tabelle `classe`
---
-ALTER TABLE `classe`
-  ADD PRIMARY KEY (`id_classe`);
-
---
--- Indici per le tabelle `docente`
---
-ALTER TABLE `docente`
-  ADD PRIMARY KEY (`id_docente`);
-
---
--- Indici per le tabelle `gruppo`
---
-ALTER TABLE `gruppo`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indici per le tabelle `indirizzo`
---
-ALTER TABLE `indirizzo`
-  ADD PRIMARY KEY (`id_indirizzo`);
-
---
--- Indici per le tabelle `proposta`
---
-ALTER TABLE `proposta`
-  ADD PRIMARY KEY (`id_proposta`);
-
---
--- Indici per le tabelle `tipo`
---
-ALTER TABLE `tipo`
-  ADD PRIMARY KEY (`id_tipo`);
-
---
--- Indici per le tabelle `utente`
---
-ALTER TABLE `utente`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`),
-  ADD KEY `group_id` (`group_id`);
-
---
--- Indici per le tabelle `viaggio`
---
-ALTER TABLE `viaggio`
-  ADD PRIMARY KEY (`id_viaggio`);
-
---
--- AUTO_INCREMENT per le tabelle scaricate
+-- Struttura della tabella `effettua`
 --
 
---
--- AUTO_INCREMENT per la tabella `gruppo`
---
-ALTER TABLE `gruppo`
-  MODIFY `id` bigint(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+CREATE TABLE `effettua` (
+    `data` char(19) NOT NULL,
+    `ruolo` varchar(20) CHARACTER SET armscii8 COLLATE armscii8_general_ci NOT NULL,
+    `rifDocente` int UNSIGNED NOT NULL,
+    `rifBozza` int UNSIGNED NOT NULL,
+    CONSTRAINT `effettua_ibfk_1` FOREIGN KEY(`rifDocente`) REFERENCES `docente` (`id`),
+    CONSTRAINT `effettua_ibfk_2` FOREIGN KEY(`rifBozza`) REFERENCES `bozza` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
 
 --
--- AUTO_INCREMENT per la tabella `utente`
---
-ALTER TABLE `utente`
-  MODIFY `id` bigint(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Limiti per le tabelle scaricate
+-- Struttura della tabella `partecipa`
 --
 
+CREATE TABLE `partecipa` (
+    `referenteViaggio` varchar(50) NOT NULL,
+    `rifViaggio` int UNSIGNED NOT NULL,
+    `rifDocente` int UNSIGNED NOT NULL,
+    CONSTRAINT `partecipa_ibfk_1` FOREIGN KEY (`rifViaggio`) REFERENCES `viaggio` (`id`),
+    CONSTRAINT `partecipa_ibfk_2` FOREIGN KEY (`rifDocente`) REFERENCES `docente` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
 --
--- Limiti per la tabella `utente`
+-- Struttura della tabella `consegue`
 --
-ALTER TABLE `utente`
-  ADD CONSTRAINT `utente_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `gruppo` (`id`);
-COMMIT;
+
+CREATE TABLE `consegue` (
+    `validitaBozza` char(2) NOT NULL,
+    `rifProposta` int UNSIGNED NOT NULL,
+    `rifBozza` int UNSIGNED NOT NULL,
+    CONSTRAINT `consegue_ibfk_1` FOREIGN KEY (`rifProposta`) REFERENCES `proposta` (`id`),
+    CONSTRAINT `consegue_ibfk_2` FOREIGN KEY (`rifBozza`) REFERENCES `bozza` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `coinvolge`
+--
+
+CREATE TABLE `coinvolge` (
+    `relazione` blob NOT NULL,
+    `rifViaggio` int UNSIGNED NOT NULL,
+    `rifClasse` int UNSIGNED NOT NULL,
+    CONSTRAINT `coinvolge_ibfk_1` FOREIGN KEY (`rifViaggio`) REFERENCES `viaggio` (`id`),
+    CONSTRAINT `coinvolge_ibfk_2` FOREIGN KEY (`rifClasse`) REFERENCES `classe` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `sostituzione`
+--
+
+CREATE TABLE `sostituzione` (
+    `sostituto` boolean NOT NULL,
+    `rifProposta` int UNSIGNED NOT NULL,
+    `rifDocente` int UNSIGNED NOT NULL,
+    CONSTRAINT `sostituzione_ibfk_1` FOREIGN KEY (`rifProposta`) REFERENCES `proposta` (`id`),
+    CONSTRAINT `sostituzione_ibfk_2` FOREIGN KEY (`rifDocente`) REFERENCES `docente` (`id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_general_ci;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

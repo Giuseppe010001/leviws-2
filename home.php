@@ -39,8 +39,6 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         #nav-titolo {
             color: white;
             text-decoration: none
-            padding: 20px;
-            margin: 1%;
         }
         @media screen and (min-width: 1920px) and (max-width: 3840px) {
             #nav-titolo {
@@ -74,7 +72,6 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 font-size: 8px;
             }
         }
-
         @media screen and (max-width: 992px) {
             .navbar-nav {
                 display: none; /* Nasconde i link della navbar */
@@ -84,7 +81,6 @@ require "includes/db.php"; // Richiedere il file includes/db.php
                 display: block; /* Mostra il pulsante per aprire il menu laterale */
             }
         }
-
         @media screen and (min-width: 993px) {
             .sidebar {
                 left: -250px !important; /* Nasconde il menu laterale quando la finestra è larga */
@@ -102,11 +98,12 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             }
         }
 
-        .transizioneInizio {
-            display: none;
+        #nav-titolo:hover, .nav-elemento:hover {
+            color: white;
+            background-color: black;
+            transition-duration: 1s
         }
-
-        a:hover {
+        #nav-titolo:hover, .nav-elemento:hover {
             text-decoration: underline;
         }
 
@@ -130,7 +127,6 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             text-decoration: none;
             font-size: 18px;
         }
-
         .sidebar a:hover {
             background: rgba(255, 255, 255, 0.2);
         }
@@ -138,6 +134,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         /* Bottone per aprire il menu (vicino alla GIF) */
         .menu-toggle {
             position: absolute;
+            padding: 4px;
             top: 10px;
             left: 10px;
             font-size: 30px;
@@ -146,6 +143,11 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             border: none;
             color: white;
             z-index: 1100;
+        }
+        .menu-toggle:hover {
+            color: white;
+            background-color: black;
+            transition-duration: 1s
         }
 
         /* Sfondo scuro per chiudere il menu */
@@ -160,6 +162,21 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             z-index: 900;
         }
 
+        .transizioneInizio {
+            display: none
+        }
+        .boxLoghi {
+            position: absolute;
+            bottom: 55%;
+            width: 85%;
+            height: 33.48%
+        }
+        .boxSaluto {
+            position: absolute;
+            bottom: 5%;
+            width: 85%;
+            height: 25%
+        }
     </style>
     <script src = "assets/js/jquery-3.7.1.js"></script>
     <script src = "assets/js/bootstrap.bundle.min.js"></script>
@@ -174,14 +191,61 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             $("h1").delay(1000).animate({opacity: 1}).delay(500).animate({opacity: 0.25}).delay(250).animate({opacity: 1});
         }
     </script>
+    <script>
+        $(document).ready(function () {
+            function checkNavbar() {
+                if ($(window).width() >= 992) {
+                    $(".sidebar").hide(); // Nascondo inizialmente il menu
+                    $(".overlay").hide();
+                } else {
+                    $(".sidebar").show();
+                }
+            }
+
+            // Apri il menu al click quando si riduce la finestra
+            $(".menu-toggle").click(function () {
+                if ($(window).width() < 992) {
+                    $(".sidebar").css("left", "0");
+                    $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
+                }
+            });
+
+            // Chiudi il menu se clicco al di fuori di esso
+            $(".overlay").click(function () {
+                $(".sidebar").css("left", "-250px");
+                $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
+            });
+
+            // Controlla la larghezza della finestra quando cambia dimensione
+            $(window).resize(checkNavbar);
+
+            // Controlla subito all'apertura della pagina
+            checkNavbar();
+        });
+    </script>
 </head>
 <body>
+
+<!-- Pulsante menu accanto alla GIF -->
+<button class = "menu-toggle">☰</button>
+
+<!-- MENU LATERALE -->
+<div class = "sidebar">
+    <a href = "home.php">Home</a>
+    <a href = "compila_proposta.php">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php">Gestione utenti</a>
+    <a href = "gestione_bozze.php">Gestione bozze</a>
+    <a href = "invia_relazione.php">Compila relazione</a>
+    <a href = "contatti.php">Contatti</a>
+    <a href = "logout.php">Log out</a>
+</div>
+
+<!-- Overlay per chiudere il menu -->
+<div class = "overlay"></div>
+
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-
-        <!-- Pulsante menu accanto alla GIF -->
-        <button class="menu-toggle">☰</button>
-
         <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
@@ -199,21 +263,6 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         </div>
     </div>
 </div>
-
-<!-- MENU LATERALE -->
-<div class="sidebar">
-    <a href="compila_proposta.php"> Compila proposta</a>
-    <a href="stampa_autorizzazione.php"> Stampa autorizzazione</a>
-    <a href="gestione_utenti.php"> Gestione utenti</a>
-    <a href="gestione_bozze.php"> Gestione bozze</a>
-    <a href="invia_relazione.php"> Compila relazione</a>
-    <a href="contatti.php"> Contatti</a>
-    <a href="logout.php"> Log out</a>
-</div>
-
-<!-- Overlay per chiudere il menu -->
-<div class="overlay"></div>
-
 <div class = "container">
     <div class = "boxLoghi">
         <table>
@@ -241,37 +290,5 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         ?>
     </div>
 </div>
-<script>
-    $(document).ready(function () {
-        function checkNavbar() {
-            if ($(window).width() >= 992) {
-                $(".sidebar").hide(); // Nascondo inizialmente il menu
-                $(".overlay").hide();
-            } else {
-                $(".sidebar").show();
-            }
-        }
-
-        // Apri il menu al click quando si riduce la finestra
-        $(".menu-toggle").click(function () {
-            if ($(window).width() < 992) {
-                $(".sidebar").css("left", "0");
-                $(".overlay").fadeIn(); // jquery --> quando clicco compare il menu
-            }
-        });
-
-        // Chiudi il menu se clicco al di fuori di esso
-        $(".overlay").click(function () {
-            $(".sidebar").css("left", "-250px");
-            $(".overlay").fadeOut(); // jquery --> quando clicco da qualsiasi parte dello schermo (tranne il menu) viene nascosto il menu
-        });
-
-        // Controlla la larghezza della finestra quando cambia dimensione
-        $(window).resize(checkNavbar);
-
-        // Controlla subito all'apertura della pagina
-        checkNavbar();
-    });
-</script>
 </body>
 </html>

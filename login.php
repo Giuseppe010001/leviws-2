@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         .boxLogin {
             position: absolute;
-            bottom: 30%;
+            bottom: 33%;
             width: 85%;
             height: 25%
         }
@@ -78,7 +78,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
     </div>
     <div class = "boxLogin">
-        <h2 class = "text-center text-light">Login</h2>
         <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 500px;">
             <?php if ($error): ?>
                 <div class = "alert alert-danger"><?php echo $error ?></div>
