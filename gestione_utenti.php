@@ -267,7 +267,7 @@ if (!isset($_SESSION["user_id"])) {
             // Elimina utente
             table.on("click", ".deleteUser", function() {
                 const userId = $(this).data("id");
-                const username = $(this).parents("tr").find("td:eq(3)").text();
+                const username = $(this).parents("tr").find("td:eq(2)").text();
                 if (confirm("Sei sicuro di voler eliminare l\'utente: " + username + '?')) {
                     $.post("azioni_utente.php?action=delete", { id: userId }, function() {
                         table.ajax.reload();

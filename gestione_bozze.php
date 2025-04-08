@@ -334,7 +334,7 @@ if (!isset($_SESSION["user_id"])) {
             story.on("click", ".deleteUser", function() {
                 const draftRif = $(this).data("id");
                 const docente = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare lo storico di " + docente + " dal seguente viaggio?")) {
+                if (confirm("Sei sicuro di voler eliminare questo storico di " + docente + " dalla bozza " + draftRif + '?')) {
                     $.post("azioni_bozza_storico.php?action=delete", { rif: draftRif }, function() {
                         story.ajax.reload();
                     });
