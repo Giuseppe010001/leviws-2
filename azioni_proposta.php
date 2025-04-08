@@ -4,7 +4,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 // Dichiarazione della variabile globale $pdo, necessaria per i file db.php e functions.php
 global $pdo;
 
-// Prelievo del valore di action da gestione_bozze.php mediante il metodo GET. Nel caso action fosse vuoto, assegnare una stringa vuota
+// Prelievo del valore di action da compila_proposta.php mediante il metodo GET. Nel caso action fosse vuoto, assegnare una stringa vuota
 $action = $_GET["action"] ?? "";
 
 // Lettura dal JSON
@@ -20,7 +20,7 @@ if ($action == "read") {
     // Array di mappatura colonne (per ordinamento)
     $columns = ["id", "descrizione"];
 
-    // Configurazione iniziale della tabella di gestione bozze
+    // Configurazione iniziale della tabella di gestione proposte
     if (!empty($searchValue)) {
         if (!preg_match("/^[a-zA-Z0-9_ ]*$/", $searchValue)) {
             echo json_encode([
@@ -37,7 +37,7 @@ if ($action == "read") {
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE id LIKE :search";
+        $query .= " WHERE `id` LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `proposta`";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `proposta` WHERE `id` LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();
@@ -79,14 +79,14 @@ if ($action == "read") {
         "data" => $data                         // Dati della pagina corrente
     ]);
 
-// Modifica bozza
+// Modifica proposta
 } elseif ($action == "edit") {
     $id = $_GET["id"];
-    $stmt = $pdo->prepare("SELECT proposta.id, proposta.descrizione, viaggio.nome, mezzo, destinazione, classe.nome as classe, numerosita FROM `proposta` LEFT JOIN (`viaggio` LEFT JOIN (`coinvolge` LEFT JOIN (`classe` LEFT JOIN `indirizzo` ON classe.rifIndirizzo = indirizzo.id) ON coinvolge.rifClasse = classe.id) ON coinvolge.rifViaggio = viaggio.id) ON proposta.id = viaggio.id WHERE proposta.id = :id");
+    $stmt = $pdo->prepare("SELECT p.id, p.descrizione, v.nome, mezzo, destinazione, cl.nome as classe, numerosita FROM `proposta` p JOIN (`viaggio` v JOIN (`coinvolge` co JOIN (`classe` cl JOIN `indirizzo` i ON cl.rifIndirizzo = i.id) ON co.rifClasse = cl.id) ON co.rifViaggio = v.id) ON p.id = v.id WHERE p.id = :id");
     $stmt -> execute([":id" => $id]);
     echo json_encode($stmt->fetch());
 
-// Salvataggio bozza
+// Salvataggio proposta
 } elseif ($action == "save") {
 
     // Dati viaggio
@@ -102,33 +102,51 @@ if ($action == "read") {
     $dataFine = date("d/m/Y H:i", $dataFine);
     $mezzo = $_POST["mezzo"];
     $destinazione = $_POST["destinazione"];
+    $userId = $_POST["userId"];
+    $ruolo = $_POST["ruolo"];
 
-    // Dati classi
+    // Dati classe
     $numClasse = $_POST["numClasse"];
     $sezClasse = $_POST["sezClasse"];
     $classe = $numClasse.$sezClasse;
     $indirizzo = $_POST["indirizzo"];
-    $userId = $_POST["userId"];
-    $ruolo = $_POST["ruolo"];
     $coordinatore = $_POST["coordinatore"];
-    $numerosita = (int) $_POST["numerosita"];
+    $numerosita = $_POST["numerosita"];
 
-    // Viaggio
+    // Gestione Viaggi
     $stmt = $pdo->prepare("UPDATE `proposta` SET `descrizione` = :descrizione WHERE `id` = :id");
     $stmt -> execute([":descrizione" => $descrizione, ":id" => $id]);
     $stmt = $pdo->prepare("UPDATE `viaggio` SET `nome` = :nome, `dataInizio` = :dataInizio, `dataFine` = :dataFine, `mezzo` = :mezzo, `destinazione` = :destinazione, `rifTipo` = :tipo WHERE `id` = :id");
     $stmt -> execute([":nome" => $nome, ":dataInizio" => $dataInizio, ":dataFine" => $dataFine, ":mezzo" => $mezzo, ":destinazione" => $destinazione, ":tipo" => $tipo, ":id" => $id]);
 
-    // Classe
-    $stmt = $pdo->prepare("INSERT INTO `classe` (`nome`, `numerosita`, `dueTerzi`, `rifDocente`, `rifIndirizzo`) VALUES (:classe, :numerosita, :dueTerzi, :rifD, :rifI)");
-    $stmt -> execute([":classe" => $classe, ":numerosita" => $numerosita, ":dueTerzi" => ($numerosita/3) * 2, ":rifD" => $coordinatore, ":rifI" => $indirizzo]);
-    $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `classe`");
-    $stmt -> execute();
-    $rifC = $stmt->fetchColumn();
-    $stmt = $pdo->prepare("INSERT INTO `coinvolge` (`rifViaggio`, `rifClasse`) VALUES (:rifV, :rifC)");
-    $stmt -> execute([":rifV" => $id, ":rifC" => $rifC]);
+    // Gestione Classi
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM `classe` WHERE `nome` = :classe");
+    $stmt -> execute([":classe" => $classe]);
+    $contClasse = $stmt->fetchColumn();
+    if ($contClasse == 0) {
+        $stmt = $pdo->prepare("INSERT INTO `classe` (`nome`, `numerosita`, `dueTerzi`, `rifDocente`, `rifIndirizzo`) VALUES (:classe, :numerosita, :dueTerzi, :coordinatore, :indirizzo)");
+        $stmt -> execute([":classe" => $classe, ":numerosita" => $numerosita, ":dueTerzi" => ($numerosita/3) * 2, ":coordinatore" => $coordinatore, ":indirizzo" => $indirizzo]);
+        $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `classe`");
+        $stmt -> execute();
+        $idClasse = $stmt->fetchColumn();
+        $stmt = $pdo->prepare("INSERT INTO `coinvolge` (`rifViaggio`, `rifClasse`) VALUES (:rifV, :rifC)");
+        $stmt -> execute([":rifV" => $id, ":rifC" => $idClasse]);
+    } else {
+        $stmt = $pdo->prepare("SELECT `id` FROM `classe` WHERE `nome` = :classe");
+        $stmt -> execute([":classe" => $classe]);
+        $idClasse = $stmt->fetchColumn();
+        $stmt = $pdo->prepare("UPDATE `classe` SET `numerosita` = :numerosita, `dueTerzi` = :dueTerzi, `rifDocente` = :coordinatore, `rifIndirizzo` = :indirizzo WHERE `id` = :id");
+        $stmt -> execute(["numerosita" => $numerosita, ":dueTerzi" => ($numerosita/3) * 2, ":coordinatore" => $coordinatore, ":indirizzo" => $indirizzo, ":id" => $idClasse]);
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM `coinvolge` WHERE `rifViaggio` = :rifV AND `rifClasse` = :rifC");
+        $stmt -> execute([":rifV" => $id, ":rifC" => $idClasse]);
+        $contCoinvolge = $stmt->fetchColumn();
+        if ($contCoinvolge == 0) {
+            $stmt = $pdo->prepare("INSERT INTO `coinvolge` (`rifViaggio`, `rifClasse`) VALUES (:rifV, :rifC)");
+            $stmt->execute([":rifV" => $id, ":rifC" => $idClasse]);
+        }
+    }
 
-    // Storico
+    // Gestione Storico
     $stmt = $pdo->prepare("SELECT `id` FROM `docente` WHERE `rifUtente` = :rif");
     $stmt -> execute([":rif" => $userId]);
     $rifD = $stmt->fetchColumn();

@@ -37,7 +37,7 @@ if ($action == "read") {
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE d.nome LIKE :search OR e.ruolo LIKE :search";
+        $query .= " WHERE b.id LIKE :search OR d.nome LIKE :search OR e.ruolo LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` b JOIN (`effettua` e JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id WHERE d.nome LIKE :search OR e.ruolo LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` b JOIN (`effettua` e JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id WHERE b.id LIKE :search OR d.nome LIKE :search OR e.ruolo LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered->execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();

@@ -33,11 +33,11 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT v.id as rif, `nome`, t.descrizione as tipo, dataInizio as data_inizio, dataFine as data_fine, `mezzo`, `destinazione` FROM `viaggio` v LEFT JOIN `tipo` t ON v.rifTipo = t.id";
+    $query = "SELECT v.id as rif, v.nome, t.nome as tipo, dataInizio as data_inizio, dataFine as data_fine, `mezzo`, `destinazione` FROM `viaggio` v LEFT JOIN `tipo` t ON v.rifTipo = t.id";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE nome LIKE :search OR t.descrizione LIKE :search OR mezzo LIKE :search OR destinazione LIKE :search";
+        $query .= " WHERE v.nome LIKE :search OR t.nome LIKE :search OR mezzo LIKE :search OR destinazione LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `viaggio` v LEFT JOIN `tipo` t ON v.rifTipo = t.id WHERE nome LIKE :search OR t.descrizione LIKE :search OR mezzo LIKE :search OR destinazione LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `viaggio` v LEFT JOIN `tipo` t ON v.rifTipo = t.id WHERE v.nome LIKE :search OR t.nome LIKE :search OR `mezzo` LIKE :search OR `destinazione` LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered->execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();

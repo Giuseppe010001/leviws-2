@@ -108,12 +108,6 @@ if ($action == "read") {
 
         // Parametri per il nuovo utente
         $docente = $_POST["docente"];
-        $docenteEmail = $docente;
-        $docenteEmail = strtok($docenteEmail, ' ');
-        $nome = strtolower($docenteEmail);
-        $docenteEmail = strtok(' ');
-        $cognome = strtolower($docenteEmail);
-        $email = $cognome.'.'.$nome."@istitutolevi.edu.it";
 
         // Creazione utente
         $password_hash = password_hash($password, PASSWORD_BCRYPT);
@@ -122,8 +116,8 @@ if ($action == "read") {
         $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `utente`");
         $stmt -> execute();
         $rif = $stmt->fetchColumn();
-        $stmt = $pdo->prepare("INSERT INTO `docente` (`nome`, `email`, `rifUtente`) VALUES (:nome, :email, :rifUtente)");
-        $stmt -> execute([":nome" => $docente, ":email" => $email, ":rifUtente" => $rif]);
+        $stmt = $pdo->prepare("INSERT INTO `docente` (`nome`, `rifUtente`) VALUES (:nome, :rifUtente)");
+        $stmt -> execute([":nome" => $docente, ":rifUtente" => $rif]);
     }
 
 // Eliminazione utente

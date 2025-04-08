@@ -169,27 +169,13 @@ if (!isset($_SESSION["user_id"])) {
             width: 85%;
             height: 33.48%
         }
-        .boxGestioneBozze {
+        .boxGestioneProposte {
             position: absolute;
             bottom: 25%;
             width: 85%;
             height: 25%
         }
-        .boxGestioneBozzeViaggi {
-            display: none;
-            position: absolute;
-            bottom: 25%;
-            width: 85%;
-            height: 25%
-        }
-        .boxGestioneBozzeClassi {
-            display: none;
-            position: absolute;
-            bottom: 25%;
-            width: 85%;
-            height: 25%
-        }
-        .boxGestioneBozzeStorico {
+        .boxGestioneProposteViaggi, .boxGestioneProposteClassi, .boxGestioneProposteStorico {
             display: none;
             position: absolute;
             bottom: 25%;
@@ -238,7 +224,7 @@ if (!isset($_SESSION["user_id"])) {
         $(document).ready(function() {
 
             // Inizializza DataTables
-            const table = $("#draftsTable").DataTable({
+            const table = $("#proposalsTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -265,7 +251,7 @@ if (!isset($_SESSION["user_id"])) {
                     "url": "includes/it-IT.json"
                 }
             });
-            const travel = $("#draftsTravelTable").DataTable({
+            const travel = $("#proposalsTravelTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -289,7 +275,7 @@ if (!isset($_SESSION["user_id"])) {
                     "url": "includes/it-IT.json"
                 }
             });
-            const classi = $("#draftsClassTable").DataTable({
+            const classi = $("#proposalsClassTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -320,7 +306,7 @@ if (!isset($_SESSION["user_id"])) {
                     "url": "includes/it-IT.json"
                 }
             });
-            const story = $("#draftsStoryTable").DataTable({
+            const story = $("#proposalsStoryTable").DataTable({
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
@@ -352,70 +338,81 @@ if (!isset($_SESSION["user_id"])) {
 
             // Mostra Viaggi
             $("#showTravel").on("click", function() {
-                $(".boxGestioneBozze").hide();
+                $(".boxGestioneProposte").hide();
                 travel.ajax.reload();
-                $(".boxGestioneBozzeViaggi").show();
+                $(".boxGestioneProposteViaggi").show();
             });
 
             // Mostra classi
             $("#showClass").on("click", function() {
-                $(".boxGestioneBozze").hide();
+                $(".boxGestioneProposte").hide();
                 classi.ajax.reload();
-                $(".boxGestioneBozzeClassi").show();
+                $(".boxGestioneProposteClassi").show();
             });
 
             // Mostra storico
             $("#showStory").on("click", function() {
-                $(".boxGestioneBozze").hide();
+                $(".boxGestioneProposte").hide();
                 story.ajax.reload();
-                $(".boxGestioneBozzeStorico").show();
+                $(".boxGestioneProposteStorico").show();
             });
 
-            // Mostra bozze
+            // Mostra proposte
             $("#goBackTravel").on("click", function() {
-                $(".boxGestioneBozzeViaggi").hide();
-                $(".boxGestioneBozze").show();
+                $(".boxGestioneProposteViaggi").hide();
+                $(".boxGestioneProposte").show();
             });
             $("#goBackClass").on("click", function() {
-                $(".boxGestioneBozzeClassi").hide();
-                $(".boxGestioneBozze").show();
+                $(".boxGestioneProposteClassi").hide();
+                $(".boxGestioneProposte").show();
             });
             $("#goBackStory").on("click", function() {
-                $(".boxGestioneBozzeStorico").hide();
-                $(".boxGestioneBozze").show();
+                $(".boxGestioneProposteStorico").hide();
+                $(".boxGestioneProposte").show();
             });
 
-            // Modifica bozza
+            // Modifica proposta
             table.on("click", ".editUser", function() {
-                const draftId = $(this).data("id");
-                $.get("azioni_proposta.php?action=edit&id=" + draftId, function(data) {
-                    const draft = JSON.parse(data);
-                    $("#draftId").val(draftId);
-                    $("#nome").val(draft.nome);
-                    $("#descrizione").val(draft.descrizione);
-                    $("#mezzo").val(draft.mezzo);
-                    $("#destinazione").val(draft.destinazione);
-                    $("#draftModal").modal("show");
+                const proposalId = $(this).data("id");
+                $.get("azioni_proposta.php?action=edit&id=" + proposalId, function(data) {
+                    const proposal = JSON.parse(data);
+                    $("#proposalId").val(proposalId);
+                    $("#nome").val(proposal.nome);
+                    $("#descrizione").val(proposal.descrizione);
+                    $("#mezzo").val(proposal.mezzo);
+                    $("#destinazione").val(proposal.destinazione);
+                    $("#proposalModal").modal("show");
                 });
+            });
+
+            // Elimina classe
+            classi.on("click", ".deleteUser", function() {
+                const proposalRif = $(this).data("id");
+                const classe = $(this).parents("tr").find("td:eq(1)").text();
+                if (confirm("Sei sicuro di voler eliminare la classe " + classe + " dal viaggio " + proposalRif + '?')) {
+                    $.post("azioni_proposta_classi.php?action=delete", { rif: proposalRif }, function() {
+                        classi.ajax.reload();
+                    });
+                }
             });
 
             // Elimina storico
             story.on("click", ".deleteUser", function() {
-                const draftRif = $(this).data("id");
+                const proposalRif = $(this).data("id");
                 const docente = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare il seguente storico riferito a " + docente + '?')) {
-                    $.post("azioni_proposta_storico.php?action=delete", { rif: draftRif }, function() {
+                if (confirm("Sei sicuro di voler eliminare questo storico di " + docente + " dal viaggio " + proposalRif + '?')) {
+                    $.post("azioni_proposta_storico.php?action=delete", { rif: proposalRif }, function() {
                         story.ajax.reload();
                     });
                 }
             });
 
-            // Salva bozza (Creazione o Modifica)
-            $("#draftForm").on("submit", function(e) {
+            // Salva proposta (Creazione o Modifica)
+            $("#proposalForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
                 $.post("azioni_proposta.php?action=save", formData, function() {
-                    $("#draftModal").modal("hide");
+                    $("#proposalModal").modal("hide");
                     table.ajax.reload();
                 });
             });
@@ -444,7 +441,7 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
@@ -471,12 +468,12 @@ if (!isset($_SESSION["user_id"])) {
             </tr>
         </table>
     </div>
-    <div class = "boxGestioneBozze">
+    <div class = "boxGestioneProposte">
         <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
             <button id = "showTravel" class = "btn btn-primary mb-3"><img src = "images/viaggi.png" class = "img-fluid" alt = "Viaggi"/></button>
             <button id = "showClass" class = "btn btn-primary mb-3"><img src = "images/classi.png" class = "img-fluid" alt = "Classi"/></button>
             <button id = "showStory" class = "btn btn-primary mb-3"><img src = "images/storico.png" class = "img-fluid" alt = "Storico"/></button>
-            <table id = "draftsTable" class = "table bg-dark text-light">
+            <table id = "proposalsTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -495,18 +492,18 @@ if (!isset($_SESSION["user_id"])) {
         </div>
 
         <!-- Modale per Creazione/Modifica Utenti -->
-        <div class = "modal fade" id = "draftModal" tabindex = "-1" aria-labelledby = "draftModalLabel" aria-hidden = "true">
+        <div class = "modal fade" id = "proposalModal" tabindex = "-1" aria-labelledby = "proposalModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
                 <div class = "modal-content bg-dark">
-                    <form id = "draftForm">
+                    <form id = "proposalForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title text-light" id = "draftModalLabel">Gestisci Proposta</h5>
+                            <h5 class = "modal-title text-light" id = "proposalModalLabel">Gestisci Proposta</h5>
                             <button type = "button" class = "btn-close btn-close-white" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
                             <fieldset>
                                 <legend class = "text-light">Viaggio</legend>
-                                <input type = "hidden" id = "draftId" name = "draftId">
+                                <input type = "hidden" id = "proposalId" name = "proposalId">
                                 <input type = "hidden" id = "userId" name = "userId" value = <?php echo $_SESSION["user_id"]?>>
                                 <div class = "mb-3">
                                     <label for = "nome" class = "form-label text-light">Nome</label>
@@ -521,7 +518,7 @@ if (!isset($_SESSION["user_id"])) {
                                 </div>
                                 <div class = "mb-3">
                                     <label for = "descrizione" class = "form-label text-light">Descrizione</label>
-                                    <textarea class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
+                                    <textarea class = "form-control" style = "width: 466px; height: 300px" id = "descrizione" name = "descrizione" required></textarea>
                                 </div>
                                 <div class = "mb-3">
                                     <label for = "dataInizio" class = "form-label text-light">Data Inizio</label>
@@ -538,6 +535,13 @@ if (!isset($_SESSION["user_id"])) {
                                 <div class = "mb-3">
                                     <label for = "destinazione" class = "form-label text-light">Destinazione</label>
                                     <input type = "text" class = "form-control" id = "destinazione" name = "destinazione" required>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "ruolo" class = "form-label text-light">Ruolo</label>
+                                    <select id = "ruolo" name = "ruolo" class = "form-select">
+                                        <option value = "Referente di Viaggio">Referente di Viaggio</option>
+                                        <option value = "Accompagnatore">Accompagnatore</option>
+                                    </select>
                                 </div>
                             </fieldset>
                             <br>
@@ -582,13 +586,6 @@ if (!isset($_SESSION["user_id"])) {
                                     </select>
                                 </div>
                                 <div class = "mb-3">
-                                    <label for = "ruolo" class = "form-label text-light">Ruolo</label>
-                                    <select id = "ruolo" name = "ruolo" class = "form-select">
-                                        <option value = "Referente di Viaggio">Referente di Viaggio</option>
-                                        <option value = "Accompagnatore">Accompagnatore</option>
-                                    </select>
-                                </div>
-                                <div class = "mb-3">
                                     <label for = "coordinatore" class = "form-label text-light">Coordinatore</label>
                                     <select id = "coordinatore" name = "coordinatore" class = "form-select">
                                         <?php
@@ -607,7 +604,7 @@ if (!isset($_SESSION["user_id"])) {
                                 </div>
                                 <div class = "mb-3">
                                     <label for = "numerosita" class = "form-label text-light">Numerosità</label>
-                                    <input type = "text" class = "form-control" id = "numerosita" name = "numerosita" required>
+                                    <input type = "number" class = "form-control" id = "numerosita" name = "numerosita" required>
                                 </div>
                             </fieldset>
                         </div>
@@ -620,10 +617,10 @@ if (!isset($_SESSION["user_id"])) {
             </div>
         </div>
     </div>
-    <div class = "boxGestioneBozzeViaggi">
+    <div class = "boxGestioneProposteViaggi">
         <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
             <button id = "goBackTravel" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
-            <table id = "draftsTravelTable" class = "table bg-dark text-light">
+            <table id = "proposalsTravelTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>RIF</th>
@@ -649,10 +646,10 @@ if (!isset($_SESSION["user_id"])) {
             </table>
         </div>
     </div>
-    <div class = "boxGestioneBozzeClassi">
+    <div class = "boxGestioneProposteClassi">
         <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
             <button id = "goBackClass" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
-            <table id = "draftsClassTable" class = "table bg-dark text-light">
+            <table id = "proposalsClassTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>RIF</th>
@@ -678,10 +675,10 @@ if (!isset($_SESSION["user_id"])) {
             </table>
         </div>
     </div>
-    <div class = "boxGestioneBozzeStorico">
+    <div class = "boxGestioneProposteStorico">
         <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
             <button id = "goBackStory" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
-            <table id = "draftsStoryTable" class = "table bg-dark text-light">
+            <table id = "proposalsStoryTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>RIF</th>

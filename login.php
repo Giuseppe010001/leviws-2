@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
     </div>
     <div class = "boxLogin">
-        <form method = "POST" class = "mx-auto bg-dark border rounded p-3 border-dark" style = "max-width: 500px;">
+        <form method = "POST" class = "mx-auto bg-dark border rounded p-3 border-dark" style = "width: 500px">
             <?php if ($error): ?>
                 <div class = "alert alert-danger"><?php echo $error ?></div>
             <?php endif; ?>

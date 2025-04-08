@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="leviws-2@localhost" uuid="14fc7ba0-6a1c-40d8-8dde-b62622a0d412">
+    <data-source source="LOCAL" name="leviws-2@localhost" uuid="9772a414-84e3-47e6-84d7-4764ccedb790">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>

@@ -23,8 +23,8 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Dati dal form
-    // Destinatario
-    $destinatario = $_POST["destinatario"];
+    // Email del mittente
+    $emailMittente = $_POST["email"];
     // Oggetto
     $oggetto = $_POST["oggetto"];
     // Corpo
@@ -36,21 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt -> execute([":id" => $_SESSION["user_id"]]);
     $nomeMittente = $stmt->fetchColumn();
     $nomeMittente = strtok($nomeMittente, ' ');
-    // Email del mittente
-    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
-    $stmt -> execute(["id" => $_SESSION["user_id"]]);
-    $emailMittente = $stmt->fetchColumn();
 
     // Destinatario
     // Nome del destinatario
-    $stmt = $pdo->prepare("SELECT `nome` FROM `docente` WHERE `id` = :id");
-    $stmt -> execute([":id" => $destinatario]);
-    $nomeDestinatario = $stmt->fetchColumn();
-    $nomeDestinatario = strtok($nomeDestinatario, ' ');
+    $nomeDestinatario = "Viaggi di Istruzione IIS \"P. Levi\" Vignola";
     // Email del destinatario
-    $stmt = $pdo->prepare("SELECT `email` FROM `docente` WHERE `id` = :id");
-    $stmt -> execute([":id" => $destinatario]);
-    $emailDestinatario = $stmt->fetchColumn();
+    $emailDestinatario = "viaggi@istitutolevi.edu.it";
 
     // Istanziare un oggetto PHPMailer
     $mail = new PHPMailer;
@@ -68,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     try {
 
         $mail -> setFrom($emailMittente, $nomeMittente);    // Mittente
-        $mail -> addAddress($emailMittente, $nomeMittente); // Destinatario
+        $mail -> addAddress($emailMittente, $nomeDestinatario); // Destinatario
 
         $mail -> Subject = $oggetto; // Oggetto
         $mail -> Body = $corpo;      // Corpo
@@ -77,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($mail -> send()) {
             $sent = "Messaggio inviato!";
         } else {
-            $error = "Messaggio non inviato!";
+            $error = "Messaggio non inviato! Provare a verificare l'indirizzo e-mail.";
         }
     } catch (phpmailerException $e) {
         $error = "Si è verificato un errore: ".$e->getMessage().'.';
@@ -300,7 +291,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
@@ -328,7 +319,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
     </div>
     <div class = "boxContatti">
-        <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px">
+        <form method = "POST" class = "mx-auto bg-dark border rounded p-3 border-dark" style = "max-width: 532px">
             <?php if ($sent): ?>
                 <div class = "alert alert-success"><?php echo $sent ?></div>
             <?php endif; ?>
@@ -336,19 +327,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <div class = "alert alert-danger"><?php echo $error ?></div>
             <?php endif; ?>
             <div class = "mb-3">
-                <label for = "destinatario" class = "form-label text-dark">Destinatario</label>
-                <select id = "destinatario" name = "destinatario" class = "form-select">
-                    <option value = '1'>Mario Sorvillo</option>
-                    <option value = '2'>Emanuele Gnoni</option>
-                </select>
+                <label for = "email" class = "form-label text-light">Mittente</label>
+                <input type = "email" id = "email" name = "email" class = "form-control" placeholder = "cognome.nome@istitutolevi.edu.it" required>
             </div>
             <div class = "mb-3">
-                <label for = "oggetto" class = "form-label text-dark">Oggetto</label>
+                <label for = "oggetto" class = "form-label text-light">Oggetto</label>
                 <input type = "text" id = "oggetto" name = "oggetto" class = "form-control" required>
             </div>
             <div class = "mb-3">
-                <label for = "corpo" class = "form-label text-dark">Corpo</label>
-                <textarea id = "corpo" name = "corpo" class = "form-control" style = "width: 498px; min-height: 200px; max-height: 200px" required></textarea>
+                <label for = "corpo" class = "form-label text-light">Corpo</label>
+                <textarea id = "corpo" name = "corpo" class = "form-control" style = "min-width: 483px; max-width: 498px; height: 200px" required></textarea>
             </div>
             <button type = "submit" class = "btn btn-primary w-100">Invia</button>
         </form>

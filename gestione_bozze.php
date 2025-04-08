@@ -308,6 +308,11 @@ if (!isset($_SESSION["user_id"])) {
                     $("#draftId").val(draft.id);
                     $("#nome").val(draft.nome);
                     $("#descrizione").val(draft.descrizione);
+                    $("#ruolo").val(draft.ruolo);
+                    if (draft.valida === "Sì")
+                        $("#valida").prop("checked", true);
+                    else
+                        $("#valida").prop("checked", false);
                     $("#draftModal").modal("show");
                 });
             });
@@ -332,7 +337,7 @@ if (!isset($_SESSION["user_id"])) {
             story.on("click", ".deleteUser", function() {
                 const draftRif = $(this).data("id");
                 const docente = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare il seguente storico riferito a " + docente + '?')) {
+                if (confirm("Sei sicuro di voler eliminare lo storico di " + docente + " dal seguente viaggio?")) {
                     $.post("azioni_bozza_storico.php?action=delete", { rif: draftRif }, function() {
                         story.ajax.reload();
                     });
@@ -373,7 +378,7 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>

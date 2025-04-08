@@ -33,11 +33,11 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT `id`, `nome`, `descrizione`, `validita` as `valida` FROM `bozza`";
+    $query = "SELECT *, `validita` as `valida` FROM `bozza`";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE nome LIKE :search";
+        $query .= " WHERE `nome` LIKE :search OR `validita` LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` WHERE `nome` LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` WHERE `nome` LIKE :search OR `validita` LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();
@@ -82,7 +82,7 @@ if ($action == "read") {
 // Modifica bozza
 } elseif ($action == "edit") {
     $id = $_GET["id"];
-    $stmt = $pdo->prepare("SELECT * FROM `bozza` WHERE `id` = :id");
+    $stmt = $pdo->prepare("SELECT *, `validita` as valida, e.ruolo FROM `bozza` b JOIN `effettua` e ON b.id = e.rifBozza WHERE `id` = :id");
     $stmt -> execute([":id" => $id]);
     echo json_encode($stmt->fetch());
 
@@ -111,6 +111,7 @@ if ($action == "read") {
         $stmt -> execute([":rifB" => $id]);
         $rifP = $stmt->fetchColumn();
         $rifV = $rifP;
+        // Eliminazione della proposta riferita alla bozza precedente
         $stmt = $pdo->prepare("DELETE FROM `consegue` WHERE `rifBozza` = :rifB");
         $stmt -> execute([":rifB" => $id]);
         $stmt = $pdo->prepare("DELETE FROM `partecipa` WHERE `rifViaggio` = :rifV");
@@ -119,6 +120,9 @@ if ($action == "read") {
         $stmt -> execute([":id" => $rifP]);
         $stmt = $pdo->prepare("DELETE FROM `viaggio` WHERE `id` = :id");
         $stmt -> execute([":id" => $rifP]);
+        $stmt = $pdo->prepare("DELETE FROM `coinvolge` WHERE `rifViaggio` = :rifV");
+        $stmt -> execute([":rifV" => $rifV]);
+        // Inserimento della nuova proposta
         if ($valida == "Sì") {
             $stmt = $pdo->prepare("INSERT INTO `proposta` (`descrizione`) VALUES (:descrizione)");
             $stmt -> execute([":descrizione" => $descrizione]);
@@ -133,7 +137,6 @@ if ($action == "read") {
             $stmt = $pdo->prepare("INSERT INTO `partecipa` (`ruolo`, `rifViaggio`, `rifDocente`) VALUES (:ruolo, :rifV, :rifD)");
             $stmt -> execute([":ruolo" => $ruolo, ":rifV" => $rifV, ":rifD" => $rifD]);
         }
-
     } else {
 
         // Creazione bozza
@@ -144,6 +147,7 @@ if ($action == "read") {
         $rifB = $stmt->fetchColumn();
         $stmt = $pdo->prepare("INSERT INTO `effettua` (`data`, `ruolo`, `rifDocente`, `rifBozza`) VALUES (:data, :ruolo, :rifD, :rifB)");
         $stmt -> execute([":data" => date("d/m/Y H:i:s", time()), ":ruolo" => $ruolo, ":rifD" => $rifD, ":rifB" => $rifB]);
+        // Inserimento della nuova proposta
         if ($valida == "Sì") {
             $stmt = $pdo->prepare("INSERT INTO `proposta` (`descrizione`) VALUES (:descrizione)");
             $stmt -> execute([":descrizione" => $descrizione]);

@@ -262,6 +262,7 @@ if (!isset($_SESSION["user_id"])) {
                     $("#userId").val(user.id);
                     $("#username").val(user.username);
                     $("#password").prop("required", false);
+                    $("#group").val(user.rifGruppo);
                     $("#userModal").modal("show");
                 });
             });
@@ -311,7 +312,7 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
