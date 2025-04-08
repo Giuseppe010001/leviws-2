@@ -89,8 +89,8 @@ if ($action == "read") {
 // Salvataggio utente
 } elseif ($action == "save") {
     $id = $_POST["userId"] ?? null;
-    $username = $_POST["username"];
-    $password = $_POST["password"] ?? null;
+    $username = trim($_POST["username"]);
+    $password = trim($_POST["password"]) ?? null;
     $group = $_POST["group"];
 
     if ($id) {
@@ -107,7 +107,7 @@ if ($action == "read") {
     } else {
 
         // Parametri per il nuovo utente
-        $docente = $_POST["docente"];
+        $docente = trim($_POST["docente"]);
 
         // Creazione utente
         $password_hash = password_hash($password, PASSWORD_BCRYPT);

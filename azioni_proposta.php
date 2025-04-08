@@ -91,8 +91,8 @@ if ($action == "read") {
 
     // Dati viaggio
     $id = $_POST["draftId"];
-    $descrizione = $_POST["descrizione"];
-    $nome = $_POST["nome"];
+    $descrizione = trim($_POST["descrizione"]);
+    $nome = trim($_POST["nome"]);
     $tipo = $_POST["tipo"];
     $dataInizio = $_POST["dataInizio"];
     $dataInizio = strtotime($dataInizio);
@@ -100,8 +100,8 @@ if ($action == "read") {
     $dataFine = $_POST["dataFine"];
     $dataFine = strtotime($dataFine);
     $dataFine = date("d/m/Y H:i", $dataFine);
-    $mezzo = $_POST["mezzo"];
-    $destinazione = $_POST["destinazione"];
+    $mezzo = trim($_POST["mezzo"]);
+    $destinazione = trim($_POST["destinazione"]);
     $userId = $_POST["userId"];
     $ruolo = $_POST["ruolo"];
 

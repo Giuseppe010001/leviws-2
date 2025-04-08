@@ -91,7 +91,7 @@ if (!isset($_SESSION["user_id"])) {
             }
         }
 
-        /* Nascondere completamente il men quando la navbar e' visibile */
+        /* Nascondere completamente il menu quando la navbar e' visibile */
         @media (min-width: 992px) {
             .menu-toggle, .sidebar, .overlay {
                 display: none !important;
@@ -101,7 +101,6 @@ if (!isset($_SESSION["user_id"])) {
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            text-decoration: underline;
             transition-duration: 0.3s;
         }
 
@@ -117,12 +116,10 @@ if (!isset($_SESSION["user_id"])) {
             padding-top: 60px;
             z-index: 1000;
         }
-
         .sidebar a {
             display: block;
             padding: 15px;
             color: white;
-            text-decoration: none;
             font-size: 18px;
         }
         .sidebar a:hover {
@@ -441,7 +438,7 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo"></a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>

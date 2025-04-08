@@ -90,8 +90,8 @@ if ($action == "read") {
 } elseif ($action == "save") {
     $id = $_POST["draftId"] ?? null;
     $userId = $_POST["userId"];
-    $nome = $_POST["nome"];
-    $descrizione = $_POST["descrizione"];
+    $nome = trim($_POST["nome"]);
+    $descrizione = trim($_POST["descrizione"]);
     $ruolo = $_POST["ruolo"];
     $valida = $_POST["valida"] ?? "No";
 
