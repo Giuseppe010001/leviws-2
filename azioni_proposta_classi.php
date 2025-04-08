@@ -18,7 +18,7 @@ if ($action == "read") {
     $orderDirection = isset($_POST["order"][0]["dir"]) && in_array($_POST["order"][0]["dir"], ["asc", "desc"]) ? $_POST["order"][0]["dir"] : "asc";
 
     // Array di mappatura colonne (per ordinamento)
-    $columns = ["rif", "docente", "ruolo", "data_creazione"];
+    $columns = ["rif", "classe", "indirizzo", "coordinatore", "numerosita", "due_terzi"];
 
     // Configurazione iniziale della tabella di gestione bozze
     if (!empty($searchValue)) {
@@ -33,11 +33,11 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT b.id as rif, d.nome as docente, e.ruolo, e.data as data_creazione FROM `bozza` b JOIN (`effettua` e JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id";
+    $query = "SELECT `rifViaggio` as rif, cl.nome as classe, i.descrizione as indirizzo, d.nome as coordinatore, `numerosita`, `dueTerzi` as due_terzi FROM `docente` d JOIN (`coinvolge` co JOIN (`classe` cl JOIN `indirizzo` i ON cl.rifIndirizzo = i.id) ON co.rifClasse = cl.id) ON cl.rifDocente = d.id";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
-        $query .= " WHERE d.nome LIKE :search OR e.ruolo LIKE :search";
+        $query .= " WHERE rifViaggio LIKE :search OR cl.nome LIKE :search OR i.descrizione LIKE :search OR d.nome LIKE :search OR numerosita LIKE :search OR dueTerzi LIKE :search";
 
     // Aggiunta ordinamento
     $query .= " ORDER BY " . $columns[$orderColumnIndex] . " $orderDirection";
@@ -58,13 +58,13 @@ if ($action == "read") {
     $stmt->execute();
     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Conteggio totale dei record
-    $totalRecordsQuery = "SELECT COUNT(*) FROM `effettua`";
+    // Conteggio totale dei record\
+    $totalRecordsQuery = "SELECT COUNT(*) FROM `classe`";
     $totalRecords = $pdo->query($totalRecordsQuery)->fetchColumn();
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` b JOIN (`effettua` e JOIN `docente` d ON e.rifDocente = d.id) ON e.rifBozza = b.id WHERE d.nome LIKE :search OR e.ruolo LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `docente` d JOIN (`coinvolge` co JOIN (`classe` cl JOIN `indirizzo` i ON cl.rifIndirizzo = i.id) ON co.rifClasse = cl.id) ON cl.rifDocente = d.id WHERE rifViaggio LIKE :search OR cl.nome LIKE :search OR i.descrizione LIKE :search OR d.nome LIKE :search OR numerosita LIKE :search OR dueTerzi LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered->execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();
@@ -78,21 +78,4 @@ if ($action == "read") {
         "recordsFiltered" => $filteredRecords,  // Totale record filtrati
         "data" => $data                         // Dati della pagina corrente
     ]);
-} elseif ($action == "delete") {
-    $rifB = $_POST["rif"];
-    $stmt = $pdo->prepare("SELECT `validita` FROM `bozza` WHERE `id` = :id");
-    $stmt -> execute(["id" => $rifB]);
-    $valida = $stmt->fetchColumn();
-    $stmt = $pdo->prepare("DELETE FROM `effettua` WHERE `rifBozza` = :rifB LIMIT 1");
-    $stmt -> execute([":rifB" => $rifB]);
-    if ($valida == "Sì") {
-        $stmt = $pdo->prepare("SELECT `rifProposta` FROM `consegue` WHERE `rifBozza` = :rifB");
-        $stmt -> execute([":rifB" => $rifB]);
-        $rifV = $stmt->fetchColumn();
-        $stmt = $pdo->prepare("DELETE FROM `consegue` WHERE `rifBozza` = :rifB LIMIT 1");
-        $stmt -> execute([":rifB" => $rifB]);
-        $stmt = $pdo->prepare("DELETE FROM `partecipa` WHERE `rifViaggio` = :rifV LIMIT 1");
-        $stmt -> execute([":rifV" => $rifV]);
-    }
 }
-

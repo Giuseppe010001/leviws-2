@@ -29,8 +29,8 @@ require "includes/db.php"; // Richiedere il file includes/db.php
             background-attachment: fixed
         }
         h1 {
-            font-family: "Brush Script MT", serif;
-            font-size: 100px
+            font-family: "Rockwell", serif;
+            font-size: 60px
         }
         td {
             padding-top: 50px;
@@ -101,10 +101,8 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
-        }
-        #nav-titolo:hover, .nav-elemento:hover {
             text-decoration: underline;
+            transition-duration: 0.3s;
         }
 
         /* MENU LATERALE */
@@ -147,7 +145,7 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         .menu-toggle:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
+            transition-duration: 0.3s;
         }
 
         /* Sfondo scuro per chiudere il menu */
@@ -231,14 +229,14 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 
 <!-- MENU LATERALE -->
 <div class = "sidebar">
-    <a href = "home.php">Home</a>
-    <a href = "compila_proposta.php">Compila proposta</a>
-    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
-    <a href = "gestione_utenti.php">Gestione utenti</a>
-    <a href = "gestione_bozze.php">Gestione bozze</a>
-    <a href = "invia_relazione.php">Compila relazione</a>
-    <a href = "contatti.php">Contatti</a>
-    <a href = "logout.php">Log out</a>
+    <a href = "home.php" class = "nav-link text-light">Home</a>
+    <a href = "compila_proposta.php" class = "nav-link text-light">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php" class = "nav-link text-light">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php" class = "nav-link text-light">Gestione utenti</a>
+    <a href = "gestione_bozze.php" class = "nav-link text-light">Gestione bozze</a>
+    <a href = "invia_relazione.php" class = "nav-link text-light">Compila relazione</a>
+    <a href = "contatti.php" class = "nav-link text-light">Contatti</a>
+    <a href = "logout.php" class = "nav-link text-light">Log out</a>
 </div>
 
 <!-- Overlay per chiudere il menu -->
@@ -246,19 +244,19 @@ require "includes/db.php"; // Richiedere il file includes/db.php
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
-                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
-                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
+                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento text-light">Compila proposta</a></li>
+                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento text-light">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION["group_id"] == 1): ?>
-                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento text-light">Gestione utenti</a></li>
                 <?php endif; ?>
-                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
-                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
-                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
-                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento">Log out</a></li>
+                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento text-light">Gestione bozze</a></li>
+                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento text-light">Compila relazione</a></li>
+                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento text-light">Contatti</a></li>
+                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento text-light">Log out</a></li>
             </ul>
         </div>
     </div>
@@ -267,9 +265,9 @@ require "includes/db.php"; // Richiedere il file includes/db.php
     <div class = "boxLoghi">
         <table>
             <tr>
-                <td><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></td>
-                <td><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></td>
-                <td><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></td>
+                <td><a href = "https://www.istitutolevi.edu.it/" title = "IIS Primo Levi"><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></a></td>
+                <td><a href = "https://pnrr.istruzione.it/" title = "Futura"><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></a></td>
+                <td><a href = "https://www.comune.vignola.mo.it/" title = "Città di Vignola"><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></a></td>
             </tr>
         </table>
     </div>
@@ -285,6 +283,8 @@ require "includes/db.php"; // Richiedere il file includes/db.php
         // Saluto all'utente loggato secondo una modalità consona all'orario di accesso
         if (date('H') > 0 and date('H') < 12)
             echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buongiorno $user!!!</h1>";
+        elseif (date('H') > 12 and date('H') < 16)
+            echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buon pomeriggio $user!!!</h1>";
         else
             echo "<h1 style = 'opacity: 0' class = 'text-center text-light'>Buonasera $user!!!</h1>";
         ?>

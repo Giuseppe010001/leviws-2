@@ -1,4 +1,8 @@
 <?php
+require "includes/db.php"; // Richiedere il file includes/db.php
+
+// Dichiarazione della variabile globale $pdo, necessaria per i file db.php e functions.php
+global $pdo;
 
 // Inizio della sessione
 session_start();
@@ -14,7 +18,7 @@ if (!isset($_SESSION["user_id"])) {
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Gestione Bozze</title>
+    <title>Compila proposta</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <link rel = "stylesheet" href = "assets/css/datatables.min.css">
     <style>
@@ -23,6 +27,10 @@ if (!isset($_SESSION["user_id"])) {
             background-repeat: no-repeat;
             background-size: cover;
             background-attachment: fixed
+        }
+        #dt-search-0, #dt-search-1, #dt-search-2, #dt-search-3 {
+            background-color: white;
+            color: black
         }
         td {
             padding-top: 50px;
@@ -93,10 +101,8 @@ if (!isset($_SESSION["user_id"])) {
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
-        }
-        #nav-titolo:hover, .nav-elemento:hover {
             text-decoration: underline;
+            transition-duration: 0.3s;
         }
 
         /* MENU LATERALE */
@@ -139,7 +145,7 @@ if (!isset($_SESSION["user_id"])) {
         .menu-toggle:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
+            transition-duration: 0.3s;
         }
 
         /* Sfondo scuro per chiudere il menu */
@@ -164,6 +170,20 @@ if (!isset($_SESSION["user_id"])) {
             height: 33.48%
         }
         .boxGestioneBozze {
+            position: absolute;
+            bottom: 25%;
+            width: 85%;
+            height: 25%
+        }
+        .boxGestioneBozzeViaggi {
+            display: none;
+            position: absolute;
+            bottom: 25%;
+            width: 85%;
+            height: 25%
+        }
+        .boxGestioneBozzeClassi {
+            display: none;
             position: absolute;
             bottom: 25%;
             width: 85%;
@@ -222,21 +242,73 @@ if (!isset($_SESSION["user_id"])) {
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_bozza.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_proposta.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
 
                     {"data": "id"},
-                    {"data": "nome"},
                     {"data": "descrizione"},
-                    {"data": "valida"},
                     {
                         "data": "id",
                         render: function (data) {
                             return `
-                            <button class = "btn btn-sm btn-warning editUser" data-id="${data}">Modifica</button>
-                            <button class = "btn btn-sm btn-danger deleteUser" style = "width: 71px" data-id="${data}">Elimina</button>
+                            <button class = "btn btn-sm btn-primary editUser" data-id="${data}"><img src = "images/modifica.png" class = "img-fluid" alt = "Modifica"/></button>
+                        `;
+                        }
+                    }
+                ],
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],  // Opzioni di paginazione
+                language: {                   // Testo personalizzato per l'interfaccia
+                    "url": "includes/it-IT.json"
+                }
+            });
+            const travel = $("#draftsTravelTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "azioni_proposta_viaggi.php?action=read", // Script PHP per ottenere i dati
+                    "type": "POST"
+                },
+                "columns": [
+
+                    {"data": "rif"},
+                    {"data": "nome"},
+                    {"data": "tipo"},
+                    {"data": "data_inizio"},
+                    {"data": "data_fine"},
+                    {"data": "mezzo"},
+                    {"data": "destinazione"}
+                ],
+                paging: true,
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],  // Opzioni di paginazione
+                language: {                   // Testo personalizzato per l'interfaccia
+                    "url": "includes/it-IT.json"
+                }
+            });
+            const classi = $("#draftsClassTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "url": "azioni_proposta_classi.php?action=read", // Script PHP per ottenere i dati
+                    "type": "POST"
+                },
+                "columns": [
+
+                    {"data": "rif"},
+                    {"data": "classe"},
+                    {"data": "indirizzo"},
+                    {"data": "coordinatore"},
+                    {"data": "numerosita"},
+                    {"data": "due_terzi"},
+                    {
+                        "data": "rif",
+                        render: function (data) {
+                            return `
+                            <button class = "btn btn-sm btn-primary deleteUser" data-id="${data}"><img src = "images/elimina.png" class = "img-fluid" alt = "Elimina"/></button>
                         `;
                         }
                     }
@@ -252,15 +324,23 @@ if (!isset($_SESSION["user_id"])) {
                 "processing": true,
                 "serverSide": true,
                 "ajax": {
-                    "url": "azioni_bozza_storico.php?action=read", // Script PHP per ottenere i dati
+                    "url": "azioni_proposta_storico.php?action=read", // Script PHP per ottenere i dati
                     "type": "POST"
                 },
                 "columns": [
 
-                    {"data": "id"},
+                    {"data": "rif"},
                     {"data": "docente"},
                     {"data": "ruolo"},
-                    {"data": "data_creazione"}
+                    {"data": "data_creazione"},
+                    {
+                        "data": "rif",
+                        render: function (data) {
+                            return `
+                            <button class = "btn btn-sm btn-primary deleteUser" data-id="${data}"><img src = "images/elimina.png" class = "img-fluid" alt = "Elimina"/></button>
+                        `;
+                        }
+                    }
                 ],
                 paging: true,
                 pageLength: 10,
@@ -270,11 +350,18 @@ if (!isset($_SESSION["user_id"])) {
                 }
             });
 
-            // Aggiungi bozza
-            $("#addDraft").on("click", function() {
-                $("#draftForm")[0].reset();
-                $("#draftId").val("");
-                $("#draftModal").modal("show");
+            // Mostra Viaggi
+            $("#showTravel").on("click", function() {
+                $(".boxGestioneBozze").hide();
+                travel.ajax.reload();
+                $(".boxGestioneBozzeViaggi").show();
+            });
+
+            // Mostra classi
+            $("#showClass").on("click", function() {
+                $(".boxGestioneBozze").hide();
+                classi.ajax.reload();
+                $(".boxGestioneBozzeClassi").show();
             });
 
             // Mostra storico
@@ -285,7 +372,15 @@ if (!isset($_SESSION["user_id"])) {
             });
 
             // Mostra bozze
-            $("#goBack").on("click", function() {
+            $("#goBackTravel").on("click", function() {
+                $(".boxGestioneBozzeViaggi").hide();
+                $(".boxGestioneBozze").show();
+            });
+            $("#goBackClass").on("click", function() {
+                $(".boxGestioneBozzeClassi").hide();
+                $(".boxGestioneBozze").show();
+            });
+            $("#goBackStory").on("click", function() {
                 $(".boxGestioneBozzeStorico").hide();
                 $(".boxGestioneBozze").show();
             });
@@ -293,22 +388,24 @@ if (!isset($_SESSION["user_id"])) {
             // Modifica bozza
             table.on("click", ".editUser", function() {
                 const draftId = $(this).data("id");
-                $.get("azioni_bozza.php?action=edit&id=" + draftId, function(data) {
+                $.get("azioni_proposta.php?action=edit&id=" + draftId, function(data) {
                     const draft = JSON.parse(data);
-                    $("#draftId").val(draft.id);
+                    $("#draftId").val(draftId);
                     $("#nome").val(draft.nome);
                     $("#descrizione").val(draft.descrizione);
+                    $("#mezzo").val(draft.mezzo);
+                    $("#destinazione").val(draft.destinazione);
                     $("#draftModal").modal("show");
                 });
             });
 
-            // Elimina bozza
-            table.on("click", ".deleteUser", function() {
-                const draftId = $(this).data("id");
-                const nome = $(this).parents("tr").find("td:eq(1)").text();
-                if (confirm("Sei sicuro di voler eliminare la bozza: " + nome + '?')) {
-                    $.post("azioni_bozza.php?action=delete", { id: draftId }, function() {
-                        table.ajax.reload();
+            // Elimina storico
+            story.on("click", ".deleteUser", function() {
+                const draftRif = $(this).data("id");
+                const docente = $(this).parents("tr").find("td:eq(1)").text();
+                if (confirm("Sei sicuro di voler eliminare il seguente storico riferito a " + docente + '?')) {
+                    $.post("azioni_proposta_storico.php?action=delete", { rif: draftRif }, function() {
+                        story.ajax.reload();
                     });
                 }
             });
@@ -317,7 +414,7 @@ if (!isset($_SESSION["user_id"])) {
             $("#draftForm").on("submit", function(e) {
                 e.preventDefault();
                 const formData = $(this).serialize();
-                $.post("azioni_bozza.php?action=save", formData, function() {
+                $.post("azioni_proposta.php?action=save", formData, function() {
                     $("#draftModal").modal("hide");
                     table.ajax.reload();
                 });
@@ -332,14 +429,14 @@ if (!isset($_SESSION["user_id"])) {
 
 <!-- MENU LATERALE -->
 <div class = "sidebar">
-    <a href = "home.php">Home</a>
-    <a href = "compila_proposta.php">Compila proposta</a>
-    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
-    <a href = "gestione_utenti.php">Gestione utenti</a>
-    <a href = "gestione_bozze.php">Gestione bozze</a>
-    <a href = "invia_relazione.php">Compila relazione</a>
-    <a href = "contatti.php">Contatti</a>
-    <a href = "logout.php">Log out</a>
+    <a href = "home.php" class = "nav-link text-light">Home</a>
+    <a href = "compila_proposta.php" class = "nav-link text-light">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php" class = "nav-link text-light">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php" class = "nav-link text-light">Gestione utenti</a>
+    <a href = "gestione_bozze.php" class = "nav-link text-light">Gestione bozze</a>
+    <a href = "invia_relazione.php" class = "nav-link text-light">Compila relazione</a>
+    <a href = "contatti.php" class = "nav-link text-light">Contatti</a>
+    <a href = "logout.php" class = "nav-link text-light">Log out</a>
 </div>
 
 <!-- Overlay per chiudere il menu -->
@@ -347,19 +444,19 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
-                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
-                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
+                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento text-light">Compila proposta</a></li>
+                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento text-light">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION["group_id"] == 1): ?>
-                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento text-light">Gestione utenti</a></li>
                 <?php endif; ?>
-                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
-                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
-                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
-                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento">Log out</a></li>
+                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento text-light">Gestione bozze</a></li>
+                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento text-light">Compila relazione</a></li>
+                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento text-light">Contatti</a></li>
+                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento text-light">Log out</a></li>
             </ul>
         </div>
     </div>
@@ -368,39 +465,29 @@ if (!isset($_SESSION["user_id"])) {
     <div class = "boxLoghi">
         <table>
             <tr>
-                <td><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></td>
-                <td><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></td>
-                <td><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></td>
+                <td><a href = "https://www.istitutolevi.edu.it/" title = "IIS Primo Levi"><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></a></td>
+                <td><a href = "https://pnrr.istruzione.it/" title = "Futura"><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></a></td>
+                <td><a href = "https://www.comune.vignola.mo.it/" title = "Città di Vignola"><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></a></td>
             </tr>
         </table>
     </div>
     <div class = "boxGestioneBozze">
-        <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "showStory" class = "btn btn-info mb-3">Storico</button>
-            <table id = "draftsTable" class = "table table-striped">
+        <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
+            <button id = "showTravel" class = "btn btn-primary mb-3"><img src = "images/viaggi.png" class = "img-fluid" alt = "Viaggi"/></button>
+            <button id = "showClass" class = "btn btn-primary mb-3"><img src = "images/classi.png" class = "img-fluid" alt = "Classi"/></button>
+            <button id = "showStory" class = "btn btn-primary mb-3"><img src = "images/storico.png" class = "img-fluid" alt = "Storico"/></button>
+            <table id = "draftsTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
                     <th>Descrizione</th>
-                    <th>Data inizio</th>
-                    <th>Data Fine</th>
-                    <th>Mezzo</th>
-                    <th>Destinazione</th>
                     <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
                     <th>ID</th>
-                    <th>Nome</th>
-                    <th>Tipo</th>
                     <th>Descrizione</th>
-                    <th>Data inizio</th>
-                    <th>Data Fine</th>
-                    <th>Mezzo</th>
-                    <th>Destinazione</th>
                     <th>Azioni</th>
                 </tr>
                 </tfoot>
@@ -410,52 +497,122 @@ if (!isset($_SESSION["user_id"])) {
         <!-- Modale per Creazione/Modifica Utenti -->
         <div class = "modal fade" id = "draftModal" tabindex = "-1" aria-labelledby = "draftModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
-                <div class = "modal-content">
+                <div class = "modal-content bg-dark">
                     <form id = "draftForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "draftModalLabel">Gestisci Proposta</h5>
-                            <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
+                            <h5 class = "modal-title text-light" id = "draftModalLabel">Gestisci Proposta</h5>
+                            <button type = "button" class = "btn-close btn-close-white" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
-                            <input type = "hidden" id = "draftId" name = "draftId">
-                            <div class = "mb-3">
-                                <label for = "nome" class = "form-label">Nome</label>
-                                <input type = "text" class = "form-control" id = "nome" name = "nome" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "tipo" class = "form-label">Tipo</label>
-                                <select id = "tipo" name = "tipo" class = "form-select">
-                                    <option value = '1'>Viaggio</option>
-                                    <option value = '2'>Uscita</option>
-                                </select>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "dataInizio" class = "form-label">Data Inizio</label>
-                                <input type = "date" class = "form-control" id = "dataInizio" name = "dataInzio" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "dataFine" class = "form-label">Data Fine</label>
-                                <input type = "date" class = "form-control" id = "dataFine" name = "dataFine" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "mezzo" class = "form-label">Mezzo</label>
-                                <input type = "text" class = "form-check-input" id = "mezzo" name = "mezzo" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "destinazione" class = "form-label">Destinazione</label>
-                                <input type = "text" class = "form-check-input" id = "destinazione" name = "destinazione" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "classe" class = "form-label">Classe</label>
-                                <input type = "text" class = "form-check-input" id = "classe" name = "classe" required>
-                            </div>
-                            <div class = "mb-3">
-                                <label for = "numerosita" class = "form-label">Numerosità</label>
-                                <input type = "text" class = "form-check-input" id = "numerosita" name = "numerosita" required>
-                            </div>
+                            <fieldset>
+                                <legend class = "text-light">Viaggio</legend>
+                                <input type = "hidden" id = "draftId" name = "draftId">
+                                <input type = "hidden" id = "userId" name = "userId" value = <?php echo $_SESSION["user_id"]?>>
+                                <div class = "mb-3">
+                                    <label for = "nome" class = "form-label text-light">Nome</label>
+                                    <input type = "text" class = "form-control" id = "nome" name = "nome" required>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "tipo" class = "form-label text-light">Tipo</label>
+                                    <select id = "tipo" name = "tipo" class = "form-select">
+                                        <option value = '1'>Viaggio</option>
+                                        <option value = '2'>Uscita</option>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "descrizione" class = "form-label text-light">Descrizione</label>
+                                    <textarea class = "form-control" style = "width: 466px; min-height: 300px; max-height: 300px" id = "descrizione" name = "descrizione" required></textarea>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "dataInizio" class = "form-label text-light">Data Inizio</label>
+                                    <input type = "datetime-local" class = "form-control" id = "dataInizio" name = "dataInizio" required>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "dataFine" class = "form-label text-light">Data Fine</label>
+                                    <input type = "datetime-local" class = "form-control" id = "dataFine" name = "dataFine" required>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "mezzo" class = "form-label text-light">Mezzo</label>
+                                    <input type = "text" class = "form-control" id = "mezzo" name = "mezzo" required>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "destinazione" class = "form-label text-light">Destinazione</label>
+                                    <input type = "text" class = "form-control" id = "destinazione" name = "destinazione" required>
+                                </div>
+                            </fieldset>
+                            <br>
+                            <br>
+                            <fieldset>
+                                <legend class = "text-light">Classe</legend>
+                                <div class = "mb-3">
+                                    <label for = "numClasse" class = "form-label text-light">Classe</label>
+                                    <select id = "numClasse" name = "numClasse" class = "form-select">
+                                        <option value = '1'>1</option>
+                                        <option value = '2'>2</option>
+                                        <option value = '3'>3</option>
+                                        <option value = '4'>4</option>
+                                        <option value = '5'>5</option>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "sezClasse" class = "form-label text-light">Sezione</label>
+                                    <select id = "sezClasse" name = "sezClasse" class = "form-select">
+                                        <option value = 'A'>A</option>
+                                        <option value = 'B'>B</option>
+                                        <option value = 'C'>C</option>
+                                        <option value = 'D'>D</option>
+                                        <option value = 'E'>E</option>
+                                        <option value = 'F'>F</option>
+                                        <option value = 'G'>G</option>
+                                        <option value = 'H'>H</option>
+                                        <option value = 'L'>L</option>
+                                        <option value = 'M'>M</option>
+                                        <option value = 'P'>P</option>
+                                        <option value = 'R'>R</option>
+                                        <option value = 'S'>S</option>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "indirizzo" class = "form-label text-light">Indirizzo</label>
+                                    <select id = "indirizzo" name = "indirizzo" class = "form-select">
+                                        <option value = '1'>LSSA</option>
+                                        <option value = '2'>ITT</option>
+                                        <option value = '3'>IPIA</option>
+                                        <option value = '4'>IPSC</option>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "ruolo" class = "form-label text-light">Ruolo</label>
+                                    <select id = "ruolo" name = "ruolo" class = "form-select">
+                                        <option value = "Referente di Viaggio">Referente di Viaggio</option>
+                                        <option value = "Accompagnatore">Accompagnatore</option>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "coordinatore" class = "form-label text-light">Coordinatore</label>
+                                    <select id = "coordinatore" name = "coordinatore" class = "form-select">
+                                        <?php
+
+                                        $stmt = $pdo->prepare("SELECT `id`, `nome` FROM `docente`");
+                                        $stmt -> execute();
+                                        $docenti = $stmt->fetchALL();
+
+                                        foreach ($docenti as $d) {
+                                            $id = $d["id"];
+                                            $nome = $d["nome"];
+                                            echo "<option value = $id>$nome</option>";
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class = "mb-3">
+                                    <label for = "numerosita" class = "form-label text-light">Numerosità</label>
+                                    <input type = "text" class = "form-control" id = "numerosita" name = "numerosita" required>
+                                </div>
+                            </fieldset>
                         </div>
                         <div class = "modal-footer">
-                            <button type = "button" class = "btn btn-secondary" data-bs-dismiss = "modal">Chiudi</button>
+                            <button type = "button" class = "btn btn-light" data-bs-dismiss = "modal">Chiudi</button>
                             <button type = "submit" class = "btn btn-primary">Salva</button>
                         </div>
                     </form>
@@ -463,46 +620,84 @@ if (!isset($_SESSION["user_id"])) {
             </div>
         </div>
     </div>
-    <div class = "boxGestioneBozzeClassi">
-        <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "goBackClass" class = "btn btn-info mb-3">Indietro</button>
-            <table id = "draftsStoryTable" class = "table table-striped">
+    <div class = "boxGestioneBozzeViaggi">
+        <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
+            <button id = "goBackTravel" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
+            <table id = "draftsTravelTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Classe</th>
-                    <th>Numerosità</th>
-                    <th>2/3</th>
+                    <th>RIF</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Data inizio</th>
+                    <th>Data Fine</th>
+                    <th>Mezzo</th>
+                    <th>Destinazione</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
-                    <th>ID</th>
-                    <th>Classe</th>
-                    <th>Numerosità</th>
-                    <th>2/3</th>
+                    <th>RIF</th>
+                    <th>Nome</th>
+                    <th>Tipo</th>
+                    <th>Data inizio</th>
+                    <th>Data Fine</th>
+                    <th>Mezzo</th>
+                    <th>Destinazione</th>
                 </tr>
                 </tfoot>
             </table>
         </div>
-    <div class = "boxGestioneBozzeStorico">
-        <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "goBackStory" class = "btn btn-info mb-3">Indietro</button>
-            <table id = "draftsStoryTable" class = "table table-striped">
+    </div>
+    <div class = "boxGestioneBozzeClassi">
+        <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
+            <button id = "goBackClass" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
+            <table id = "draftsClassTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Docente</th>
-                    <th>Ruolo</th>
-                    <th>Data</th>
+                    <th>RIF</th>
+                    <th>Classe</th>
+                    <th>Indirizzo</th>
+                    <th>Coordinatore</th>
+                    <th>Numerosità</th>
+                    <th>2/3</th>
+                    <th data-dt-order = "disable">Azioni</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
-                    <th>ID</th>
+                    <th>RIF</th>
+                    <th>Classe</th>
+                    <th>Indirizzo</th>
+                    <th>Coordinatore</th>
+                    <th>Numerosità</th>
+                    <th>2/3</th>
+                    <th>Azioni</th>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    <div class = "boxGestioneBozzeStorico">
+        <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
+            <button id = "goBackStory" class = "btn btn-primary mb-3"><img src = "images/indietro.png" class = "img-fluid" alt = "Indietro"/></button>
+            <table id = "draftsStoryTable" class = "table bg-dark text-light">
+                <thead>
+                <tr>
+                    <th>RIF</th>
                     <th>Docente</th>
                     <th>Ruolo</th>
                     <th>Data</th>
+                    <th data-dt-order = "disable">Azioni</th>
+                </tr>
+                </thead>
+                <tfoot>
+                <tr>
+                    <th>RIF</th>
+                    <th>Docente</th>
+                    <th>Ruolo</th>
+                    <th>Data</th>
+                    <th>Azioni</th>
                 </tr>
                 </tfoot>
             </table>

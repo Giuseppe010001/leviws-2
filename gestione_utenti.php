@@ -24,6 +24,10 @@ if (!isset($_SESSION["user_id"])) {
             background-size: cover;
             background-attachment: fixed
         }
+        #dt-search-0 {
+            background-color: white;
+            color: black
+        }
         td {
             padding-top: 50px;
             padding-left: 5px
@@ -93,10 +97,8 @@ if (!isset($_SESSION["user_id"])) {
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
-        }
-        #nav-titolo:hover, .nav-elemento:hover {
             text-decoration: underline;
+            transition-duration: 0.3s;
         }
 
         /* MENU LATERALE */
@@ -139,7 +141,7 @@ if (!isset($_SESSION["user_id"])) {
         .menu-toggle:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
+            transition-duration: 0.3s;
         }
 
         /* Sfondo scuro per chiudere il menu */
@@ -160,7 +162,7 @@ if (!isset($_SESSION["user_id"])) {
         .boxLoghi {
             position: absolute;
             bottom: 55%;
-            width: 85%;
+            width: 84.7%;
             height: 33.48%
         }
         .boxGestioneUtenti {
@@ -228,8 +230,8 @@ if (!isset($_SESSION["user_id"])) {
                         "data": "id",
                         render: function (data) {
                             return `
-                            <button class = "btn btn-sm btn-warning editUser" data-id="${data}">Modifica</button>
-                            <button class = "btn btn-sm btn-danger deleteUser" style = "width: 71px" data-id="${data}">Elimina</button>
+                            <button class = "btn btn-sm btn-primary editUser" data-id="${data}"><img src = "images/modifica.png" class = "img-fluid" alt = "Modifica"/></button>
+                            <button class = "btn btn-sm btn-primary deleteUser" data-id="${data}"><img src = "images/elimina.png" class = "img-fluid" alt = "Elimina"/></button>
                         `;
                         }
                     }
@@ -290,18 +292,18 @@ if (!isset($_SESSION["user_id"])) {
 <body>
 
 <!-- Pulsante menu accanto alla GIF -->
-<button class = "menu-toggle">☰</button>
+<button class = "menu-toggle text-light">☰</button>
 
 <!-- MENU LATERALE -->
 <div class = "sidebar">
-    <a href = "home.php">Home</a>
-    <a href = "compila_proposta.php">Compila proposta</a>
-    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
-    <a href = "gestione_utenti.php">Gestione utenti</a>
-    <a href = "gestione_bozze.php">Gestione bozze</a>
-    <a href = "invia_relazione.php">Compila relazione</a>
-    <a href = "contatti.php">Contatti</a>
-    <a href = "logout.php">Log out</a>
+    <a href = "home.php" class = "nav-link text-light">Home</a>
+    <a href = "compila_proposta.php" class = "nav-link text-light">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php" class = "nav-link text-light">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php" class = "nav-link text-light">Gestione utenti</a>
+    <a href = "gestione_bozze.php" class = "nav-link text-light">Gestione bozze</a>
+    <a href = "invia_relazione.php" class = "nav-link text-light">Compila relazione</a>
+    <a href = "contatti.php" class = "nav-link text-light">Contatti</a>
+    <a href = "logout.php" class = "nav-link text-light">Log out</a>
 </div>
 
 <!-- Overlay per chiudere il menu -->
@@ -309,17 +311,17 @@ if (!isset($_SESSION["user_id"])) {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
-                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Compila proposta</a></li>
-                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
-                <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
-                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
-                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
-                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
-                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento">Log out</a></li>
+                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento text-light">Compila proposta</a></li>
+                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento text-light">Stampa autorizzazione</a></li>
+                <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento text-light">Gestione utenti</a></li>
+                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento text-light">Gestione bozze</a></li>
+                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento text-light">Compila relazione</a></li>
+                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento text-light">Contatti</a></li>
+                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento text-light">Log out</a></li>
             </ul>
         </div>
     </div>
@@ -328,16 +330,16 @@ if (!isset($_SESSION["user_id"])) {
     <div class = "boxLoghi">
         <table>
             <tr>
-                <td><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></td>
-                <td><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></td>
-                <td><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></td>
+                <td><a href = "https://www.istitutolevi.edu.it/" title = "IIS Primo Levi"><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></a></td>
+                <td><a href = "https://pnrr.istruzione.it/" title = "Futura"><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></a></td>
+                <td><a href = "https://www.comune.vignola.mo.it/" title = "Città di Vignola"><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></a></td>
             </tr>
         </table>
     </div>
     <div class = "boxGestioneUtenti">
-        <div class = "container mt-5 p-2 bg-light border rounded">
-            <button id = "addUser" class = "btn btn-primary mb-3">Aggiungi Utente</button>
-            <table id = "usersTable" class = "table table-striped">
+        <div class = "container mt-5 p-2 bg-dark border rounded border-dark text-light">
+            <button id = "addUser" class = "btn btn-primary mb-3"><img src = "images/aggiungi.png" class = "img-fluid" alt = "Aggiungi"/></button>
+            <table id = "usersTable" class = "table bg-dark text-light">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -362,28 +364,28 @@ if (!isset($_SESSION["user_id"])) {
         <!-- Modale per Creazione/Modifica Utenti -->
         <div class = "modal fade" id = "userModal" tabindex = "-1" aria-labelledby = "userModalLabel" aria-hidden = "true">
             <div class = "modal-dialog">
-                <div class = "modal-content">
+                <div class = "modal-content bg-dark">
                     <form id = "userForm">
                         <div class = "modal-header">
-                            <h5 class = "modal-title" id = "userModalLabel">Gestisci Utente</h5>
-                            <button type = "button" class = "btn-close" data-bs-dismiss = "modal" aria-label = "Close"></button>
+                            <h5 class = "modal-title text-light" id = "userModalLabel">Gestisci Utente</h5>
+                            <button type = "button" class = "btn-close btn-close-white" data-bs-dismiss = "modal" aria-label = "Close"></button>
                         </div>
                         <div class = "modal-body">
                             <input type = "hidden" id = "userId" name = "userId">
                             <div id = "docenteBlocco" class = "mb-3">
-                                <label for = "docente" class = "form-label">Docente</label>
+                                <label for = "docente" class = "form-label text-light">Docente</label>
                                 <input type = "text" class = "form-control" id = "docente" name = "docente" placeholder = "Nome Cognome" required>
                             </div>
                             <div class = "mb-3">
-                                <label for = "username" class = "form-label">Username</label>
+                                <label for = "username" class = "form-label text-light">Username</label>
                                 <input type = "text" class = "form-control" id = "username" name = "username" required>
                             </div>
                             <div class = "mb-3">
-                                <label for = "password" class = "form-label">Password</label>
+                                <label for = "password" class = "form-label text-light">Password</label>
                                 <input type = "password" class = "form-control" id = "password" name = "password">
                             </div>
                             <div class = "mb-3">
-                                <label for = "group" class = "form-label">Gruppo</label>
+                                <label for = "group" class = "form-label text-light">Gruppo</label>
                                 <select id = "group" name = "group" class = "form-select">
                                     <option value = '1'>Admin</option>
                                     <option value = '2'>Utente</option>
@@ -391,7 +393,7 @@ if (!isset($_SESSION["user_id"])) {
                             </div>
                         </div>
                         <div class = "modal-footer">
-                            <button type = "button" class = "btn btn-secondary" data-bs-dismiss = "modal">Chiudi</button>
+                            <button type = "button" class = "btn btn-light" data-bs-dismiss = "modal">Chiudi</button>
                             <button type = "submit" class = "btn btn-primary">Salva</button>
                         </div>
                     </form>

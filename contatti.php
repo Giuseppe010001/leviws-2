@@ -167,10 +167,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         #nav-titolo:hover, .nav-elemento:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
-        }
-        #nav-titolo:hover, .nav-elemento:hover {
             text-decoration: underline;
+            transition-duration: 0.3s;
         }
 
         /* MENU LATERALE */
@@ -213,7 +211,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .menu-toggle:hover {
             color: white;
             background-color: black;
-            transition-duration: 1s
+            transition-duration: 0.3s;
         }
 
         /* Sfondo scuro per chiudere il menu */
@@ -287,14 +285,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- MENU LATERALE -->
 <div class = "sidebar">
-    <a href = "home.php">Home</a>
-    <a href = "compila_proposta.php">Compila proposta</a>
-    <a href = "stampa_autorizzazione.php">Stampa autorizzazione</a>
-    <a href = "gestione_utenti.php">Gestione utenti</a>
-    <a href = "gestione_bozze.php">Gestione bozze</a>
-    <a href = "invia_relazione.php">Compila relazione</a>
-    <a href = "contatti.php">Contatti</a>
-    <a href = "logout.php">Log out</a>
+    <a href = "home.php" class = "nav-link text-light">Home</a>
+    <a href = "compila_proposta.php" class = "nav-link text-light">Compila proposta</a>
+    <a href = "stampa_autorizzazione.php" class = "nav-link text-light">Stampa autorizzazione</a>
+    <a href = "gestione_utenti.php" class = "nav-link text-light">Gestione utenti</a>
+    <a href = "gestione_bozze.php" class = "nav-link text-light">Gestione bozze</a>
+    <a href = "invia_relazione.php" class = "nav-link text-light">Compila relazione</a>
+    <a href = "contatti.php" class = "nav-link text-light">Contatti</a>
+    <a href = "logout.php" class = "nav-link text-light">Log out</a>
 </div>
 
 <!-- Overlay per chiudere il menu -->
@@ -302,19 +300,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class = "navbar navbar-expand-lg navbar-dark bg-dark">
     <div class = "container">
-        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
+        <a id = "nav-titolo" href = "https://www.istitutolevi.edu.it" target = "_blank" style = "font-family: 'Rockwell', serif" title = "IIS Primo Levi">IIS Primo Levi in <img src = "images/logo.gif" class = "img-fluid" alt = "Logo">!</a>
         <div class = "collapse navbar-collapse">
             <ul class = "navbar-nav ms-auto">
-                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
-                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
-                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
+                <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento text-light">Home</a></li>
+                <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento text-light">Compila proposta</a></li>
+                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento text-light">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION["group_id"] == 1): ?>
-                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
+                    <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento text-light">Gestione utenti</a></li>
                 <?php endif; ?>
-                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento">Gestione bozze</a></li>
-                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento">Compila relazione</a></li>
-                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento">Contatti</a></li>
-                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento">Log out</a></li>
+                <li class = "nav-item"><a href = "gestione_bozze.php" class = "nav-link nav-elemento text-light">Gestione bozze</a></li>
+                <li class = "nav-item"><a href = "invia_relazione.php" class = "nav-link nav-elemento text-light">Compila relazione</a></li>
+                <li class = "nav-item"><a href = "contatti.php" class = "nav-link nav-elemento text-light">Contatti</a></li>
+                <li class = "nav-item"><a href = "logout.php" class = "nav-link nav-elemento text-light">Log out</a></li>
             </ul>
         </div>
     </div>
@@ -323,14 +321,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class = "boxLoghi">
         <table>
             <tr>
-                <td><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></td>
-                <td><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></td>
-                <td><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></td>
+                <td><a href = "https://www.istitutolevi.edu.it/" title = "IIS Primo Levi"><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></a></td>
+                <td><a href = "https://pnrr.istruzione.it/" title = "Futura"><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></a></td>
+                <td><a href = "https://www.comune.vignola.mo.it/" title = "Città di Vignola"><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></a></td>
             </tr>
         </table>
     </div>
     <div class = "boxContatti">
-        <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px;">
+        <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 532px">
             <?php if ($sent): ?>
                 <div class = "alert alert-success"><?php echo $sent ?></div>
             <?php endif; ?>

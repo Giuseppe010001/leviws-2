@@ -33,7 +33,7 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT id, nome, descrizione, validita as valida FROM bozza";
+    $query = "SELECT `id`, `nome`, `descrizione`, `validita` as `valida` FROM `bozza`";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` WHERE nome LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `bozza` WHERE `nome` LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();
@@ -107,22 +107,31 @@ if ($action == "read") {
         $stmt -> execute([":nome" => $nome, ":descrizione" => $descrizione, ":validita" => $valida, ":id" => $id]);
         $stmt = $pdo->prepare("INSERT INTO `effettua` (`data`, `ruolo`, `rifDocente`, `rifBozza`) VALUES (:data, :ruolo, :rifD, :rifB)");
         $stmt -> execute([":data" => date("d/m/Y H:i:s", time()), ":ruolo" => $ruolo, ":rifD" => $rifD, ":rifB" => $id]);
+        $stmt = $pdo->prepare("SELECT `rifProposta` FROM `consegue` WHERE `rifBozza` = :rifB");
+        $stmt -> execute([":rifB" => $id]);
+        $rifP = $stmt->fetchColumn();
+        $rifV = $rifP;
+        $stmt = $pdo->prepare("DELETE FROM `consegue` WHERE `rifBozza` = :rifB");
+        $stmt -> execute([":rifB" => $id]);
+        $stmt = $pdo->prepare("DELETE FROM `partecipa` WHERE `rifViaggio` = :rifV");
+        $stmt -> execute([":rifV" => $rifV]);
+        $stmt = $pdo->prepare("DELETE FROM `proposta` WHERE `id` = :id");
+        $stmt -> execute([":id" => $rifP]);
+        $stmt = $pdo->prepare("DELETE FROM `viaggio` WHERE `id` = :id");
+        $stmt -> execute([":id" => $rifP]);
         if ($valida == "Sì") {
             $stmt = $pdo->prepare("INSERT INTO `proposta` (`descrizione`) VALUES (:descrizione)");
             $stmt -> execute([":descrizione" => $descrizione]);
             $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `proposta`");
             $stmt -> execute();
             $rifP = $stmt->fetchColumn();
+            $rifV = $rifP;
+            $stmt = $pdo->prepare("INSERT INTO `viaggio` (`id`, `nome`) VALUES (:id, :nome)");
+            $stmt -> execute([":id" => $rifP, ":nome" => $nome]);
             $stmt = $pdo->prepare("INSERT INTO `consegue` (`data`, `rifProposta`, `rifBozza`) VALUES (:data, :rifP, :rifB)");
             $stmt -> execute([":data" => date("d/m/Y H:i:s", time()), ":rifP" => $rifP, ":rifB" => $id]);
-        } else {
-            $stmt = $pdo->prepare("SELECT `rifProposta` FROM `consegue` WHERE `rifBozza` = :rifB");
-            $stmt -> execute([":rifB" => $id]);
-            $rifP = $stmt->fetchColumn();
-            $stmt = $pdo->prepare("DELETE FROM `consegue` WHERE `rifBozza` = :rifB");
-            $stmt -> execute([":rifB" => $id]);
-            $stmt = $pdo->prepare("DELETE FROM `proposta` WHERE `id` = :id");
-            $stmt -> execute([":id" => $rifP]);
+            $stmt = $pdo->prepare("INSERT INTO `partecipa` (`ruolo`, `rifViaggio`, `rifDocente`) VALUES (:ruolo, :rifV, :rifD)");
+            $stmt -> execute([":ruolo" => $ruolo, ":rifV" => $rifV, ":rifD" => $rifD]);
         }
 
     } else {
@@ -141,23 +150,21 @@ if ($action == "read") {
             $stmt = $pdo->prepare("SELECT MAX(`id`) FROM `proposta`");
             $stmt -> execute();
             $rifP = $stmt->fetchColumn();
+            $rifV = $rifP;
+            $stmt = $pdo->prepare("INSERT INTO `viaggio` (`id`, `nome`) VALUES (:id, :nome)");
+            $stmt -> execute([":id" => $rifP, ":nome" => $nome]);
             $stmt = $pdo->prepare("INSERT INTO `consegue` (`data`, `rifProposta`, `rifBozza`) VALUES (:data, :rifP, :rifB)");
             $stmt -> execute([":data" => date("d/m/Y H:i:s", time()), ":rifP" => $rifP, ":rifB" => $rifB]);
+            $stmt = $pdo->prepare("INSERT INTO `partecipa` (`ruolo`, `rifViaggio`, `rifDocente`) VALUES (:ruolo, :rifV, :rifD)");
+            $stmt -> execute([":ruolo" => $ruolo, ":rifV" => $rifV, ":rifD" => $rifD]);
         }
     }
 
 // Eliminazione bozza
 } elseif ($action == "delete") {
     $id = $_POST["id"];
-    $stmt = $pdo->prepare("SELECT `rifProposta` FROM `consegue` WHERE `rifBozza` = :rifB");
+    $stmt = $pdo->prepare("DELETE FROM `effettua` WHERE `rifBozza` = :rifB");
     $stmt -> execute([":rifB" => $id]);
-    $rifP = $stmt->fetchColumn();
-    $stmt = $pdo->prepare("DELETE FROM `consegue` WHERE `rifBozza` = :rifB");
-    $stmt -> execute([":rifB" => $id]);
-    $stmt = $pdo->prepare("DELETE FROM `proposta` WHERE `id` = :id");
-    $stmt -> execute([":id" => $rifP]);
-    $stmt = $pdo->prepare("DELETE FROM `effettua` WHERE `rifBozza` = :rif");
-    $stmt -> execute([":rif" => $id]);
     $stmt = $pdo->prepare("DELETE FROM `bozza` WHERE `id` = :id");
     $stmt -> execute([":id" => $id]);
 }

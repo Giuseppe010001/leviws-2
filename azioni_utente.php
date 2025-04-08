@@ -33,7 +33,7 @@ if ($action == "read") {
     }
 
     // Costruzione query principale
-    $query = "SELECT g.nome as group_name, u.id, u.username, d.nome as docente FROM `gruppo` g LEFT JOIN (`utente` u LEFT JOIN `docente` d ON u.id = d.rifUtente) ON g.id = u.rifGruppo";
+    $query = "SELECT g.nome as group_name, u.id, u.username, d.nome as docente FROM `gruppo` g JOIN (`utente` u JOIN `docente` d ON u.id = d.rifUtente) ON g.id = u.rifGruppo";
 
     // Aggiunta filtro di ricerca
     if (!empty($searchValue))
@@ -64,7 +64,7 @@ if ($action == "read") {
 
     // Conteggio totale con filtro
     if (!empty($searchValue)) {
-        $filteredRecordsQuery = "SELECT COUNT(*) FROM `gruppo` g LEFT JOIN (`utente` u LEFT JOIN `docente` d ON u.id = d.rifUtente) ON g.id = u.rifGruppo WHERE g.nome LIKE :search OR u.username LIKE :search OR d.nome LIKE :search";
+        $filteredRecordsQuery = "SELECT COUNT(*) FROM `gruppo` g JOIN (`utente` u JOIN `docente` d ON u.id = d.rifUtente) ON g.id = u.rifGruppo WHERE g.nome LIKE :search OR u.username LIKE :search OR d.nome LIKE :search";
         $stmtFiltered = $pdo->prepare($filteredRecordsQuery);
         $stmtFiltered -> execute([":search" => $searchValue]);
         $filteredRecords = $stmtFiltered->fetchColumn();

@@ -71,23 +71,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class = "boxLoghi">
         <table>
             <tr>
-                <td><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></td>
-                <td><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></td>
-                <td><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></td>
+                <td><a href = "https://www.istitutolevi.edu.it/" title = "IIS Primo Levi"><img src = "images/logoLevi.png" class = "transizioneInizio img-thumbnail" alt = "Logo Levi"/></a></td>
+                <td><a href = "https://pnrr.istruzione.it/" title = "Futura"><img src = "images/logoFutura.png" class = "transizioneInizio img-thumbnail" alt = "Logo Futura"/></a></td>
+                <td><a href = "https://www.comune.vignola.mo.it/" title = "Città di Vignola"><img src = "images/logoVignola.png" class = "transizioneInizio img-thumbnail" alt = "Logo Vignola"/></a></td>
             </tr>
         </table>
     </div>
     <div class = "boxLogin">
-        <form method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 500px;">
+        <form method = "POST" class = "mx-auto bg-dark border rounded p-3 border-dark" style = "max-width: 500px;">
             <?php if ($error): ?>
                 <div class = "alert alert-danger"><?php echo $error ?></div>
             <?php endif; ?>
             <div class = "mb-3">
-                <label for = "username" class = "form-label text-dark">Username</label>
+                <label for = "username" class = "form-label text-light">Username</label>
                 <input type = "text" id = "username" name = "username" class = "form-control" required>
             </div>
             <div class = "mb-3">
-                <label for = "password" class = "form-label text-dark">Password</label>
+                <label for = "password" class = "form-label text-light">Password</label>
                 <input type = "password" id = "password" name = "password" class = "form-control" required>
             </div>
             <button type = "submit" class = "btn btn-primary w-100">Login</button>
