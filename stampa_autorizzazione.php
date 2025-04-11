@@ -11,7 +11,6 @@ if (!isset($_SESSION["user_id"])) {
 
 require "includes/db.php"; // Richiedere il file includes/db.php
 require "includes/functions.php"; // Richiedere il file includes/functions.php
-require('includes/FPDF-master/fpdf.php'); // Richiedere il file includes/FPDF-master/fpdf.php
 
 // Importare i font forniti dalla libreria FPDF-master
 const FPDF_FONTPATH = 'includes/FPDF-master/font';
@@ -21,7 +20,7 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
 <head>
     <meta charset = "UTF-8">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <title>Compila Modulo</title>
+    <title>Stampa autorizzazione</title>
     <link rel = "stylesheet" href = "assets/css/bootstrap.min.css">
     <style>
         body {
@@ -89,7 +88,8 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
             position: absolute;
             bottom: 15%;
             width: 85%;
-            height: 25%
+            height: 20%;
+            text-align: center;
         }
     </style>
     <script src = "assets/js/jquery-3.7.1.js"></script>
@@ -104,7 +104,7 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
             <ul class = "navbar-nav ms-auto">
                 <li class = "nav-item"><a href = "home.php" class = "nav-link nav-elemento">Home</a></li>
                 <li class = "nav-item"><a href = "compila_proposta.php" class = "nav-link nav-elemento">Invia proposta</a></li>
-                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Compila modulo</a></li>
+                <li class = "nav-item"><a href = "stampa_autorizzazione.php" class = "nav-link nav-elemento">Stampa autorizzazione</a></li>
                 <?php if ($_SESSION['group_id'] === 1): ?>
                     <li class = "nav-item"><a href = "gestione_utenti.php" class = "nav-link nav-elemento">Gestione utenti</a></li>
                 <?php endif; ?>
@@ -127,22 +127,13 @@ const FPDF_FONTPATH = 'includes/FPDF-master/font';
         </table>
     </div>
     <div class = "boxScaricaAutorizzazione">
-        <table>
-           <tr>
-               <td>
-                   <h4 class = "text-center text-light">Autorizzazione Viaggio/visita d'istruzione</h4>
-                   <form action = "genera_modulo_Visita_Viaggio_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 250px; max-height: 100px">
-                       <button type = "submit" class = "btn btn-primary w-100">Scarica PDF</button>
-                   </form>
-               </td>
-               <td>
-                   <h4 class = "text-center text-light">Autorizzazione Uscita didattica</h4>
-                   <form action = "genera_modulo_Uscita_Didattica_pdf.php" method = "POST" class = "mx-auto bg-light border rounded p-3" style = "max-width: 250px; max-height: 100px">
-                       <button type = "submit" class = "btn btn-primary w-100">Scarica PDF</button>
-                   </form>
-               </td>
-           </tr>
-        </table>
+        <form action = "genera_modulo_Visita_Viaggio_word.php" method = "POST" class = "mx-auto bg-light border rounded p-3 bg-dark border-dark" style = "max-width: 350px; max-height: 250px">
+            <label class="text-light">Autorizzazione (Viaggio o visita d'istruzione)</label>
+           <button type = "submit" class = "btn btn-primary w-100">Scarica</button>
+            <br><br>
+            <label class="text-light">Autorizzazione (Uscita didattica)</label>
+           <button type = "submit" class = "btn btn-primary w-100">Scarica</button>
+        </form>
     </div>
 </div>
 </body>
