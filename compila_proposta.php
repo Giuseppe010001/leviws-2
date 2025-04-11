@@ -237,6 +237,7 @@ if (!isset($_SESSION["user_id"])) {
                         render: function (data) {
                             return `
                             <button class = "btn btn-sm btn-primary editUser" data-id="${data}"><img src = "images/modifica.png" class = "img-fluid" alt = "Modifica"/></button>
+                            <button class = "btn btn-sm btn-primary deleteUser" data-id="${data}"><img src = "images/scarica.png" class = "img-fluid" alt = "Scarica"/></button>
                         `;
                         }
                     }
